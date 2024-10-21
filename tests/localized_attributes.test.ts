@@ -73,7 +73,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: Update localizedAttributes with invalid value`, async () => {
       const client = await getClient(permission);
-      const newLocalizedAttributes = "hello" as any; // bad localizedAttributes value
+      const newLocalizedAttributes = "hello" as unknown as LocalizedAttributes;
 
       await expect(
         client

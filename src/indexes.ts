@@ -56,6 +56,7 @@ import {
   SearchSimilarDocumentsParams,
   LocalizedAttributes,
   UpdateDocumentsByFunctionOptions,
+  EnqueuedTaskObject,
 } from "./types";
 import { removeUndefinedFromObject } from "./utils";
 import { HttpRequests } from "./http-requests";
@@ -719,7 +720,10 @@ class Index<T extends Record<string, any> = Record<string, any>> {
     pagination: PaginationSettings,
   ): Promise<EnqueuedTask> {
     const url = `indexes/${this.uid}/settings/pagination`;
-    const task = await this.httpRequest.patch(url, pagination);
+    const task: EnqueuedTaskObject = await this.httpRequest.patch(
+      url,
+      pagination,
+    );
 
     return new EnqueuedTask(task);
   }
@@ -1147,7 +1151,10 @@ class Index<T extends Record<string, any> = Record<string, any>> {
    */
   async updateFaceting(faceting: Faceting): Promise<EnqueuedTask> {
     const url = `indexes/${this.uid}/settings/faceting`;
-    const task = await this.httpRequest.patch(url, faceting);
+    const task: EnqueuedTaskObject = await this.httpRequest.patch(
+      url,
+      faceting,
+    );
 
     return new EnqueuedTask(task);
   }
@@ -1357,7 +1364,10 @@ class Index<T extends Record<string, any> = Record<string, any>> {
    */
   async updateEmbedders(embedders: Embedders): Promise<EnqueuedTask> {
     const url = `indexes/${this.uid}/settings/embedders`;
-    const task = await this.httpRequest.patch(url, embedders);
+    const task: EnqueuedTaskObject = await this.httpRequest.patch(
+      url,
+      embedders,
+    );
 
     return new EnqueuedTask(task);
   }

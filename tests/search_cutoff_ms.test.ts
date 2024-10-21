@@ -6,7 +6,7 @@ import {
   expect,
   test,
 } from "vitest";
-import { ErrorStatusCode } from "../src/types";
+import { ErrorStatusCode, SearchCutoffMs } from "../src/types";
 import {
   clearAllIndexes,
   config,
@@ -71,7 +71,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: Update searchCutoffMs with invalid value`, async () => {
       const client = await getClient(permission);
-      const newSearchCutoffMs = "hello" as any; // bad searchCutoffMs value
+      const newSearchCutoffMs = "hello" as unknown as SearchCutoffMs;
 
       await expect(
         client.index(index.uid).updateSearchCutoffMs(newSearchCutoffMs),
