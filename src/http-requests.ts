@@ -134,7 +134,7 @@ class HttpRequests {
 
     // in case a custom content-type is provided
     // do not stringify body
-    if (!config.headers?.["Content-Type"]) {
+    if (!Object.hasOwn(config.headers, "Content-Type")) {
       body = JSON.stringify(body);
     }
 
