@@ -1262,8 +1262,10 @@ describe.each([
     });
     try {
       await client.health();
-    } catch (e: any) {
-      expect(e.cause.message).toEqual("request timed out after 1ms");
+    } catch (e) {
+      expect(e.cause as { message: string }).toEqual(
+        "request timed out after 1ms",
+      );
       expect(e.name).toEqual("MeiliSearchRequestError");
     }
   });
@@ -1285,7 +1287,7 @@ describe.each([
         { queries: [{ indexUid: "doesn't matter" }] },
         { signal: ac.signal },
       );
-    } catch (e: any) {
+    } catch (e) {
       assert.strictEqual(e.cause, someErrorObj);
       assert.strictEqual(e.name, "MeiliSearchRequestError");
     }
@@ -1316,7 +1318,7 @@ describe.each([
       );
       setTimeout(() => ac.abort(someErrorObj), 1);
       await promise;
-    } catch (e: any) {
+    } catch (e) {
       assert.strictEqual(e.cause, someErrorObj);
       assert.strictEqual(e.name, "MeiliSearchRequestError");
     } finally {
