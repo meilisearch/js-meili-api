@@ -1260,8 +1260,10 @@ describe.each([
     });
     try {
       await client.health();
-    } catch (e: any) {
-      expect(e.cause.message).toEqual("Error: Request Timed Out");
+    } catch (e) {
+      expect(e.cause as { message: string }).toEqual(
+        "Error: Request Timed Out",
+      );
       expect(e.name).toEqual("MeiliSearchRequestError");
     }
   });

@@ -106,7 +106,7 @@ describe.each([
       });
       const health = await client.isHealthy();
       expect(health).toBe(false); // Left here to trigger failed test if error is not thrown
-    } catch (e: any) {
+    } catch (e) {
       expect(e.message).toMatch(`${BAD_HOST}/api/health`);
       expect(e.name).toBe("MeiliSearchRequestError");
     }
@@ -122,7 +122,7 @@ describe.each([
       });
       const health = await client.isHealthy();
       expect(health).toBe(false); // Left here to trigger failed test if error is not thrown
-    } catch (e: any) {
+    } catch (e) {
       expect(e.message).toMatch(`${BAD_HOST}/api/health`);
       expect(e.name).toBe("MeiliSearchRequestError");
     }
@@ -138,7 +138,7 @@ describe.each([
       });
       const health = await client.isHealthy();
       expect(health).toBe(false); // Left here to trigger failed test if error is not thrown
-    } catch (e: any) {
+    } catch (e) {
       expect(e.message).toMatch(`${BAD_HOST}//health`);
       expect(e.name).toBe("MeiliSearchRequestError");
     }
@@ -154,7 +154,7 @@ describe.each([
       });
       const health = await client.isHealthy();
       expect(health).toBe(false); // Left here to trigger failed test if error is not thrown
-    } catch (e: any) {
+    } catch (e) {
       expect(e.message).toMatch(`${BAD_HOST}/health`);
       expect(e.name).toBe("MeiliSearchRequestError");
     }
@@ -164,7 +164,7 @@ describe.each([
     const client = new MeiliSearch({ host: "http://localhost:9345" });
     try {
       await client.health();
-    } catch (e: any) {
+    } catch (e) {
       expect(e.name).toEqual("MeiliSearchRequestError");
     }
   });

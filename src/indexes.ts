@@ -265,7 +265,7 @@ class Index<T extends Record<string, any> = Record<string, any>> {
    */
   async update(data: IndexOptions): Promise<EnqueuedTask> {
     const url = `indexes/${this.uid}`;
-    const task = await this.httpRequest.patch(url, data);
+    const task: EnqueuedTask = await this.httpRequest.patch(url, data);
 
     task.enqueuedAt = new Date(task.enqueuedAt);
 
@@ -674,9 +674,9 @@ class Index<T extends Record<string, any> = Record<string, any>> {
    */
   async updateSettings(settings: Settings): Promise<EnqueuedTask> {
     const url = `indexes/${this.uid}/settings`;
-    const task = await this.httpRequest.patch(url, settings);
+    const task: EnqueuedTask = await this.httpRequest.patch(url, settings);
 
-    task.enqueued = new Date(task.enqueuedAt);
+    task.enqueuedAt = new Date(task.enqueuedAt);
 
     return task;
   }
@@ -1104,7 +1104,7 @@ class Index<T extends Record<string, any> = Record<string, any>> {
     typoTolerance: TypoTolerance,
   ): Promise<EnqueuedTask> {
     const url = `indexes/${this.uid}/settings/typo-tolerance`;
-    const task = await this.httpRequest.patch(url, typoTolerance);
+    const task: EnqueuedTask = await this.httpRequest.patch(url, typoTolerance);
 
     task.enqueuedAt = new Date(task.enqueuedAt);
 

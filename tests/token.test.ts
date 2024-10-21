@@ -161,9 +161,9 @@ describe.each([{ permission: "Admin" }])(
       const [_, payload] = token.split(".");
       const searchClient = new MeiliSearch({ host: HOST, apiKey: token });
 
-      expect(JSON.parse(decode64(payload)).exp).toEqual(
-        Math.floor(date.getTime() / 1000),
-      );
+      const { exp } = JSON.parse(decode64(payload));
+
+      expect(exp).toEqual(Math.floor(date.getTime() / 1000));
       await expect(
         searchClient.index(UID).search(),
       ).resolves.not.toBeUndefined();
