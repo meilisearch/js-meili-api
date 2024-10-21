@@ -275,7 +275,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
         apiKey: key,
         async httpClient(url, init) {
           const result = await fetch(url, init);
-          return result.json();
+          return result.json() as Promise<Response>;
         },
       });
       const health = await client.isHealthy();

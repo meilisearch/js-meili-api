@@ -264,7 +264,8 @@ Hint: It might not be working because maybe you're not up to date with the Meili
             method: "GET",
           },
         );
-        const documentsGet: ResourceResults<Book[]> = await res.json();
+        const documentsGet: ResourceResults<Book[]> =
+          (await res.json()) as ResourceResults<Book[]>;
 
         expect(documentsGet.results.length).toEqual(dataset.length);
         expect(documentsGet.results[0]).toHaveProperty("_vectors");
@@ -307,7 +308,8 @@ Hint: It might not be working because maybe you're not up to date with the Meili
             method: "GET",
           },
         );
-        const documentsGet: ResourceResults<Book[]> = await res.json();
+        const documentsGet: ResourceResults<Book[]> =
+          (await res.json()) as ResourceResults<Book[]>;
 
         expect(documentsGet.results.length).toEqual(dataset.length);
         expect(documentsGet.results[0]).not.toHaveProperty("_vectors");

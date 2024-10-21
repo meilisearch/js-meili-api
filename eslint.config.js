@@ -33,11 +33,6 @@ module.exports = [
     rules: {
       ...config.rules,
       "tsdoc/syntax": "error",
-      // @TODO: Remove the ones between "~~", adapt code
-      // ~~
-      "@typescript-eslint/no-unsafe-return": "off",
-      "@typescript-eslint/no-unsafe-assignment": "off",
-      // ~~
       "@typescript-eslint/array-type": ["warn", { default: "array-simple" }],
       // @TODO: Should be careful with this rule, should leave it be and disable
       //       it within files where necessary with explanations
