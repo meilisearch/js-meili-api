@@ -1186,7 +1186,6 @@ describe.each([
       "unreachable",
       {},
       {
-        // @ts-ignore qwe
         signal: controller.signal,
       },
     );
@@ -1212,25 +1211,18 @@ describe.each([
       searchQuery,
       {},
       {
-        // @ts-ignore
         signal: controllerA.signal,
       },
     );
 
-    const searchBPromise = client.index(index.uid).search(
-      searchQuery,
-      {},
-      {
-        // @ts-ignore
-        signal: controllerB.signal,
-      },
-    );
+    const searchBPromise = client
+      .index(index.uid)
+      .search(searchQuery, {}, { signal: controllerB.signal });
 
     const searchCPromise = client.index(index.uid).search(
       searchQuery,
       {},
       {
-        // @ts-ignore
         signal: controllerC.signal,
       },
     );

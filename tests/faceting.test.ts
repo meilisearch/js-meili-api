@@ -51,7 +51,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
       const client = await getClient(permission);
       const newFaceting = {
         maxValuesPerFacet: 12,
-        sortFacetValuesBy: { test: "count" as "count" },
+        sortFacetValuesBy: { test: "count" as const },
       };
       const task = await client.index(index.uid).updateFaceting(newFaceting);
       await client.index(index.uid).waitForTask(task.taskUid);
