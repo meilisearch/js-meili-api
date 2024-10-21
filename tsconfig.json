@@ -22,7 +22,7 @@
     // This matters for the generated CJS and ESM file, UMD file is down-leveled further to support IE11
     // (only the syntax, URL, URLSearchParams, fetch is not IE11 compatible) with the help of Babel.
     "target": "es2022",
-    "lib": ["ESNext", "dom"],
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "strict": true,
     "noImplicitReturns": true
   },

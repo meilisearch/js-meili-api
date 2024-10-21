@@ -78,7 +78,7 @@ const clearAllIndexes = async (config: Config): Promise<void> => {
   const client = new MeiliSearch(config);
 
   const { results } = await client.getRawIndexes();
-  const indexes = results.map((elem) => elem.uid);
+  const indexes = results.map(({ uid }) => uid);
 
   const taskIds: number[] = [];
   for (const indexUid of indexes) {

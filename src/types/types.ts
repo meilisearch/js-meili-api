@@ -6,14 +6,44 @@
 
 import { Task } from "../task";
 
+export type URLSearchParamsRecord = Record<
+  string,
+  | string
+  | string[]
+  | Array<string | string[]>
+  | number
+  | number[]
+  | boolean
+  | Date
+  | null
+  | undefined
+>;
+
+export type ExtraRequestInit = Omit<RequestInit, "body" | "method">;
+export type BaseRequestInit = Omit<ExtraRequestInit, "signal">;
+export type HttpRequestsRequestInit = Omit<BaseRequestInit, "headers"> & {
+  headers: Headers;
+};
+
 export type Config = {
   host: string;
   apiKey?: string;
   clientAgents?: string[];
-  requestConfig?: Partial<Omit<RequestInit, "body" | "method">>;
-  httpClient?: (input: string, init?: RequestInit) => Promise<any>;
+  requestInit?: BaseRequestInit;
+  httpClient?: typeof fetch;
   timeout?: number;
 };
+
+export type RequestOptions = {
+  relativeURL: string;
+  method?: string;
+  params?: URLSearchParamsRecord;
+  headers?: HeadersInit;
+  body?: unknown;
+  extraRequestInit?: ExtraRequestInit;
+};
+
+export type MethodOptions = Omit<RequestOptions, "method">;
 
 ///
 /// Resources
@@ -359,9 +389,7 @@ export type SortableAttributes = string[] | null;
 export type DisplayedAttributes = string[] | null;
 export type RankingRules = string[] | null;
 export type StopWords = string[] | null;
-export type Synonyms = {
-  [field: string]: string[];
-} | null;
+export type Synonyms = Record<string, string[]> | null;
 export type TypoTolerance = {
   enabled?: boolean | null;
   disableOnAttributes?: string[] | null;
@@ -524,9 +552,9 @@ export type TasksQuery = {
   from?: number;
 };
 
-export type CancelTasksQuery = Omit<TasksQuery, "limit" | "from"> & {};
+export type CancelTasksQuery = Omit<TasksQuery, "limit" | "from">;
 
-export type DeleteTasksQuery = Omit<TasksQuery, "limit" | "from"> & {};
+export type DeleteTasksQuery = Omit<TasksQuery, "limit" | "from">;
 
 export type EnqueuedTaskObject = {
   taskUid: number;
