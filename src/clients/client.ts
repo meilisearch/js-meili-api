@@ -16,8 +16,6 @@ import {
   Stats,
   Version,
   ErrorStatusCode,
-  TokenSearchRules,
-  TokenOptions,
   KeyUpdate,
   IndexesQuery,
   IndexesResults,
@@ -489,11 +487,7 @@ class Client {
    * @param options - Token options to customize some aspect of the token.
    * @returns The token in JWT format.
    */
-  generateTenantToken(
-    _apiKeyUid: string,
-    _searchRules: TokenSearchRules,
-    _options?: TokenOptions,
-  ): Promise<string> {
+  generateTenantToken(): Promise<string> {
     const error = new Error();
     error.message = `Meilisearch: failed to generate a tenant token. Generation of a token only works in a node environment \n ${error.stack}.`;
 
