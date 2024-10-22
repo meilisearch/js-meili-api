@@ -1233,24 +1233,23 @@ describe.each([
 
     controllerB.abort();
 
-    void searchDPromise.then((response) => {
-      expect(response).toHaveProperty("query", searchQuery);
-    });
-
-    void searchCPromise.then((response) => {
-      expect(response).toHaveProperty("query", searchQuery);
-    });
-
-    void searchAPromise.then((response) => {
-      expect(response).toHaveProperty("query", searchQuery);
-    });
-
-    searchBPromise.catch((error) => {
-      expect(error).toHaveProperty(
-        "cause.message",
-        "This operation was aborted",
-      );
-    });
+    await Promise.all([
+      searchDPromise.then((response) => {
+        expect(response).toHaveProperty("query", searchQuery);
+      }),
+      searchCPromise.then((response) => {
+        expect(response).toHaveProperty("query", searchQuery);
+      }),
+      searchAPromise.then((response) => {
+        expect(response).toHaveProperty("query", searchQuery);
+      }),
+      searchBPromise.catch((error) => {
+        expect(error).toHaveProperty(
+          "cause.message",
+          "This operation was aborted",
+        );
+      }),
+    ]);
   });
 
   test(`${permission} key: search should be aborted when reaching timeout`, async () => {
