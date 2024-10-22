@@ -33,7 +33,6 @@ module.exports = [
     rules: {
       ...config.rules,
       "tsdoc/syntax": "error",
-      "@typescript-eslint/array-type": ["warn", { default: "array-simple" }],
       // @TODO: Should be careful with this rule, should leave it be and disable
       //       it within files where necessary with explanations
       "@typescript-eslint/no-explicit-any": "off",
@@ -43,9 +42,6 @@ module.exports = [
         // varsIgnorePattern: https://eslint.org/docs/latest/rules/no-unused-vars#varsignorepattern
         { args: "all", argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
       ],
-      // @TODO: Not recommended to disable rule, should instead disable locally
-      //       with explanation
-      "@typescript-eslint/ban-ts-ignore": "off",
     },
   })),
   // Vitest linting for test files
