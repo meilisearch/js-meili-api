@@ -28,7 +28,10 @@ import {
   SearchResponse,
   FederatedMultiSearchParams,
   ExtraRequestInit,
+  TokenSearchRules,
+  TokenOptions,
 } from "../types";
+import { MeiliSearchApiError } from "../errors";
 import { HttpRequests } from "../http-requests";
 import { TaskClient } from "../task";
 import { EnqueuedTask } from "../enqueued-task";
@@ -167,8 +170,8 @@ class Client {
       return true;
     } catch (e) {
       if (
-        (e as { code?: ErrorStatusCode }).code ===
-        ErrorStatusCode.INDEX_NOT_FOUND
+        e instanceof MeiliSearchApiError &&
+        e.cause?.code === ErrorStatusCode.INDEX_NOT_FOUND
       ) {
         return false;
       }
@@ -225,7 +228,9 @@ class Client {
     queries: FederatedMultiSearchParams,
     extraRequestInit?: ExtraRequestInit,
   ): Promise<SearchResponse<T>>;
-  async multiSearch<T extends Record<string, unknown> = Record<string, unknown>>(
+  async multiSearch<
+    T extends Record<string, unknown> = Record<string, unknown>,
+  >(
     queries: MultiSearchParams | FederatedMultiSearchParams,
     extraRequestInit?: ExtraRequestInit,
   ): Promise<MultiSearchResponse<T> | SearchResponse<T>> {
@@ -481,9 +486,17 @@ class Client {
 
   /**
    * Generate a tenant token
+   *
+   * @param apiKeyUid - The uid of the api key used as issuer of the token.
+   * @param searchRules - Search rules that are applied to every search.
+   * @param options - Token options to customize some aspect of the token.
    * @returns The token in JWT format.
    */
-  generateTenantToken(): Promise<string> {
+  generateTenantToken(
+    _apiKeyUid: string,
+    _searchRules: TokenSearchRules,
+    _options?: TokenOptions,
+  ): Promise<string> {
     const error = new Error();
     error.message = `Meilisearch: failed to generate a tenant token. Generation of a token only works in a node environment \n ${error.stack}.`;
 

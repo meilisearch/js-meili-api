@@ -33,6 +33,10 @@ module.exports = [
     rules: {
       ...config.rules,
       "tsdoc/syntax": "error",
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { args: "all", argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      ],
     },
   })),
   // Vitest linting for test files
