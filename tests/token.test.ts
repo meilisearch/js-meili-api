@@ -15,6 +15,12 @@ const HASH_ALGORITHM = "HS256";
 const TOKEN_TYP = "JWT";
 const UID = "movies_test";
 
+type TokenPayload = {
+  apiKeyUid?: string;
+  exp?: number;
+  searchRules?: string[];
+};
+
 afterAll(() => {
   return clearAllIndexes(config);
 });
@@ -48,7 +54,10 @@ describe.each([{ permission: "Admin" }])(
       const [header64] = token.split(".");
 
       // header
-      const { typ, alg } = JSON.parse(decode64(header64));
+      const { typ, alg } = JSON.parse(decode64(header64)) as {
+        typ: string;
+        alg: string;
+      };
       expect(alg).toEqual(HASH_ALGORITHM);
       expect(typ).toEqual(TOKEN_TYP);
     });
@@ -76,10 +85,12 @@ describe.each([{ permission: "Admin" }])(
       const apiKey = await getKey(permission);
       const { uid } = await client.getKey(apiKey);
       const token = await client.generateTenantToken(uid, [], {});
-      const [_, payload64] = token.split(".");
+      const payload64 = token.split(".")?.[1];
 
       // payload
-      const { apiKeyUid, exp, searchRules } = JSON.parse(decode64(payload64));
+      const { apiKeyUid, exp, searchRules } = JSON.parse(
+        decode64(payload64),
+      ) as TokenPayload;
 
       expect(apiKeyUid).toEqual(uid);
       expect(exp).toBeUndefined();
@@ -91,10 +102,12 @@ describe.each([{ permission: "Admin" }])(
       const apiKey = await getKey(permission);
       const { uid } = await client.getKey(apiKey);
       const token = await client.generateTenantToken(uid, [UID]);
-      const [_, payload64] = token.split(".");
+      const payload64 = token.split(".")?.[1];
 
       // payload
-      const { apiKeyUid, exp, searchRules } = JSON.parse(decode64(payload64));
+      const { apiKeyUid, exp, searchRules } = JSON.parse(
+        decode64(payload64),
+      ) as TokenPayload;
 
       expect(apiKeyUid).toEqual(uid);
       expect(exp).toBeUndefined();
@@ -106,10 +119,12 @@ describe.each([{ permission: "Admin" }])(
       const apiKey = await getKey(permission);
       const { uid } = await client.getKey(apiKey);
       const token = await client.generateTenantToken(uid, { [UID]: {} });
-      const [_, payload64] = token.split(".");
+      const payload64 = token.split(".")?.[1];
 
       // payload
-      const { apiKeyUid, exp, searchRules } = JSON.parse(decode64(payload64));
+      const { apiKeyUid, exp, searchRules } = JSON.parse(
+        decode64(payload64),
+      ) as TokenPayload;
       expect(apiKeyUid).toEqual(uid);
       expect(exp).toBeUndefined();
       expect(searchRules).toEqual({ [UID]: {} });
@@ -158,12 +173,12 @@ describe.each([{ permission: "Admin" }])(
         expiresAt: date,
       });
 
-      const [_, payload] = token.split(".");
+      const payload = token.split(".")?.[1];
       const searchClient = new MeiliSearch({ host: HOST, apiKey: token });
 
-      expect(JSON.parse(decode64(payload)).exp).toEqual(
-        Math.floor(date.getTime() / 1000),
-      );
+      const { exp } = JSON.parse(decode64(payload)) as TokenPayload;
+
+      expect(exp).toEqual(Math.floor(date.getTime() / 1000));
       await expect(
         searchClient.index(UID).search(),
       ).resolves.not.toBeUndefined();

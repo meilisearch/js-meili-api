@@ -49,7 +49,7 @@ const indexUid = "movies"
   const res: SearchResponse<Movie> = await index.search(
     'avenger',
     searchParams
-  )
+  ) as unknown as SearchResponse<Movie>
 
   // both work
   const { hits }: { hits: Hits<Movie> } = res

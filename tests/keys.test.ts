@@ -1,6 +1,6 @@
 import { expect, test, describe, beforeEach, afterAll } from "vitest";
 import MeiliSearch from "../src/browser";
-import { ErrorStatusCode } from "../src/types";
+import { ErrorStatusCode, Key } from "../src/types";
 import {
   clearAllIndexes,
   config,
@@ -41,7 +41,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
       const keys = await client.getKeys();
 
       const searchKey = keys.results.find(
-        (key: any) => key.name === "Default Search API Key",
+        (key: Key) => key.name === "Default Search API Key",
       );
 
       expect(searchKey).toBeDefined();
@@ -59,7 +59,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
       expect(searchKey?.updatedAt).toBeInstanceOf(Date);
 
       const adminKey = keys.results.find(
-        (key: any) => key.name === "Default Admin API Key",
+        (key: Key) => key.name === "Default Admin API Key",
       );
 
       expect(adminKey).toBeDefined();

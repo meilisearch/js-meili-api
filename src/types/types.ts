@@ -6,14 +6,44 @@
 
 import { Task } from "../task";
 
+export type URLSearchParamsRecord = Record<
+  string,
+  | string
+  | string[]
+  | Array<string | string[]>
+  | number
+  | number[]
+  | boolean
+  | Date
+  | null
+  | undefined
+>;
+
+export type ExtraRequestInit = Omit<RequestInit, "body" | "method">;
+export type BaseRequestInit = Omit<ExtraRequestInit, "signal">;
+export type HttpRequestsRequestInit = Omit<BaseRequestInit, "headers"> & {
+  headers: Headers;
+};
+
 export type Config = {
   host: string;
   apiKey?: string;
   clientAgents?: string[];
-  requestConfig?: Partial<Omit<RequestInit, "body" | "method">>;
-  httpClient?: (input: string, init?: RequestInit) => Promise<any>;
+  requestInit?: BaseRequestInit;
+  httpClient?: typeof fetch;
   timeout?: number;
 };
+
+export type RequestOptions = {
+  relativeURL: string;
+  method?: string;
+  params?: URLSearchParamsRecord;
+  headers?: HeadersInit;
+  body?: unknown;
+  extraRequestInit?: ExtraRequestInit;
+};
+
+export type MethodOptions = Omit<RequestOptions, "method">;
 
 ///
 /// Resources
@@ -207,7 +237,7 @@ export type RankingScoreDetails = {
     matchType: string;
     score: number;
   };
-  [key: string]: Record<string, any> | undefined;
+  [key: string]: Record<string, unknown> | undefined;
 };
 
 export type FederationDetails = {
@@ -216,7 +246,7 @@ export type FederationDetails = {
   weightedRankingScore: number;
 };
 
-export type Hit<T = Record<string, any>> = T & {
+export type Hit<T = Record<string, unknown>> = T & {
   _formatted?: Partial<T>;
   _matchesPosition?: MatchesPosition<T>;
   _rankingScore?: number;
@@ -224,13 +254,13 @@ export type Hit<T = Record<string, any>> = T & {
   _federation?: FederationDetails;
 };
 
-export type Hits<T = Record<string, any>> = Array<Hit<T>>;
+export type Hits<T = Record<string, unknown>> = Array<Hit<T>>;
 
 export type FacetStat = { min: number; max: number };
 export type FacetStats = Record<string, FacetStat>;
 
 export type SearchResponse<
-  T = Record<string, any>,
+  T = Record<string, unknown>,
   S extends SearchParams | undefined = undefined,
 > = {
   hits: Hits<T>;
@@ -277,7 +307,7 @@ type HasPage<S extends SearchParams> = undefined extends S["page"]
 
 export type MultiSearchResult<T> = SearchResponse<T> & { indexUid: string };
 
-export type MultiSearchResponse<T = Record<string, any>> = {
+export type MultiSearchResponse<T = Record<string, unknown>> = {
   results: Array<MultiSearchResult<T>>;
 };
 
@@ -301,7 +331,7 @@ export type SearchSimilarDocumentsParams = {
  ** Documents
  */
 
-type Fields<T = Record<string, any>> =
+type Fields<T = Record<string, unknown>> =
   | Array<Extract<keyof T, string>>
   | Extract<keyof T, string>;
 
@@ -324,7 +354,7 @@ export type RawDocumentAdditionOptions = DocumentOptions & {
   csvDelimiter?: string;
 };
 
-export type DocumentsQuery<T = Record<string, any>> = ResourceQuery & {
+export type DocumentsQuery<T = Record<string, unknown>> = ResourceQuery & {
   fields?: Fields<T>;
   filter?: Filter;
   limit?: number;
@@ -332,7 +362,7 @@ export type DocumentsQuery<T = Record<string, any>> = ResourceQuery & {
   retrieveVectors?: boolean;
 };
 
-export type DocumentQuery<T = Record<string, any>> = {
+export type DocumentQuery<T = Record<string, unknown>> = {
   fields?: Fields<T>;
 };
 
@@ -345,7 +375,7 @@ export type DocumentsIds = string[] | number[];
 export type UpdateDocumentsByFunctionOptions = {
   function: string;
   filter?: string | string[];
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
 };
 
 /*
@@ -359,9 +389,7 @@ export type SortableAttributes = string[] | null;
 export type DisplayedAttributes = string[] | null;
 export type RankingRules = string[] | null;
 export type StopWords = string[] | null;
-export type Synonyms = {
-  [field: string]: string[];
-} | null;
+export type Synonyms = Record<string, string[]> | null;
 export type TypoTolerance = {
   enabled?: boolean | null;
   disableOnAttributes?: string[] | null;
@@ -412,8 +440,8 @@ export type RestEmbedder = {
   dimensions?: number;
   documentTemplate?: string;
   distribution?: Distribution;
-  request: Record<string, any>;
-  response: Record<string, any>;
+  request: Record<string, unknown>;
+  response: Record<string, unknown>;
   headers?: Record<string, string>;
 };
 
@@ -524,9 +552,9 @@ export type TasksQuery = {
   from?: number;
 };
 
-export type CancelTasksQuery = Omit<TasksQuery, "limit" | "from"> & {};
+export type CancelTasksQuery = Omit<TasksQuery, "limit" | "from">;
 
-export type DeleteTasksQuery = Omit<TasksQuery, "limit" | "from"> & {};
+export type DeleteTasksQuery = Omit<TasksQuery, "limit" | "from">;
 
 export type EnqueuedTaskObject = {
   taskUid: number;
@@ -1075,7 +1103,7 @@ export type ErrorStatusCode =
   (typeof ErrorStatusCode)[keyof typeof ErrorStatusCode];
 
 export type TokenIndexRules = {
-  [field: string]: any;
+  [field: string]: unknown;
   filter?: Filter;
 };
 export type TokenSearchRules =

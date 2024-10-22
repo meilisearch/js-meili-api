@@ -589,10 +589,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     test(`${permission} key: Try to cancel without filters and fail`, async () => {
       const client = await getClient(permission);
 
-      await expect(
-        // @ts-expect-error testing wrong argument type
-        client.cancelTasks(),
-      ).rejects.toHaveProperty(
+      await expect(client.cancelTasks()).rejects.toHaveProperty(
         "cause.code",
         ErrorStatusCode.MISSING_TASK_FILTERS,
       );

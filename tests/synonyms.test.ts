@@ -28,7 +28,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: Get default synonyms`, async () => {
       const client = await getClient(permission);
-      const response: object = await client.index(index.uid).getSynonyms();
+      const response = await client.index(index.uid).getSynonyms();
 
       expect(response).toEqual({});
     });

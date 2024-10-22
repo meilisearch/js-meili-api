@@ -1,5 +1,10 @@
 import { afterAll, expect, test, describe, beforeEach } from "vitest";
-import { ErrorStatusCode, TaskStatus, TaskTypes } from "../src/types";
+import {
+  ErrorStatusCode,
+  ResourceResults,
+  TaskStatus,
+  TaskTypes,
+} from "../src/types";
 import {
   clearAllIndexes,
   config,
@@ -171,7 +176,7 @@ describe("Documents tests", () => {
           throw new Error(
             "getDocuments should have raised an error when the route does not exist",
           );
-        } catch (e: any) {
+        } catch (e) {
           expect(e.message).toEqual(
             "404: Not Found\nHint: It might not be working because maybe you're not up to date with the Meilisearch version that getDocuments call requires.",
           );
@@ -188,7 +193,7 @@ describe("Documents tests", () => {
           throw new Error(
             "getDocuments should have raised an error when the filter is badly formatted",
           );
-        } catch (e: any) {
+        } catch (e) {
           expect(e.message).toEqual(
             `Attribute \`id\` is not filterable. This index does not have configured filterable attributes.
 1:3 id = 1
@@ -259,7 +264,8 @@ Hint: It might not be working because maybe you're not up to date with the Meili
             method: "GET",
           },
         );
-        const documentsGet = await res.json();
+        const documentsGet: ResourceResults<Book[]> =
+          (await res.json()) as ResourceResults<Book[]>;
 
         expect(documentsGet.results.length).toEqual(dataset.length);
         expect(documentsGet.results[0]).toHaveProperty("_vectors");
@@ -302,7 +308,8 @@ Hint: It might not be working because maybe you're not up to date with the Meili
             method: "GET",
           },
         );
-        const documentsGet = await res.json();
+        const documentsGet: ResourceResults<Book[]> =
+          (await res.json()) as ResourceResults<Book[]>;
 
         expect(documentsGet.results.length).toEqual(dataset.length);
         expect(documentsGet.results[0]).not.toHaveProperty("_vectors");
@@ -662,7 +669,7 @@ Hint: It might not be working because maybe you're not up to date with the Meili
           throw new Error(
             "deleteDocuments should have raised an error when the parameters are wrong",
           );
-        } catch (e: any) {
+        } catch (e) {
           expect(e.message).toEqual(
             "Sending an empty filter is forbidden.\nHint: It might not be working because maybe you're not up to date with the Meilisearch version that deleteDocuments call requires.",
           );
@@ -679,7 +686,7 @@ Hint: It might not be working because maybe you're not up to date with the Meili
           throw new Error(
             "deleteDocuments should have raised an error when the route does not exist",
           );
-        } catch (e: any) {
+        } catch (e) {
           expect(e.message).toEqual(
             "404: Not Found\nHint: It might not be working because maybe you're not up to date with the Meilisearch version that deleteDocuments call requires.",
           );
