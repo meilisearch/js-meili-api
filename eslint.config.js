@@ -33,9 +33,6 @@ module.exports = [
     rules: {
       ...config.rules,
       "tsdoc/syntax": "error",
-      // @TODO: Should be careful with this rule, should leave it be and disable
-      //       it within files where necessary with explanations
-      "@typescript-eslint/no-explicit-any": "off",
     },
   })),
   // Vitest linting for test files

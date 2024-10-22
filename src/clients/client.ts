@@ -55,7 +55,7 @@ class Client {
    * @param indexUid - The index UID
    * @returns Instance of Index
    */
-  index<T extends Record<string, any> = Record<string, any>>(
+  index<T extends Record<string, unknown> = Record<string, unknown>>(
     indexUid: string,
   ): Index<T> {
     return new Index<T>(this.config, indexUid);
@@ -68,7 +68,7 @@ class Client {
    * @param indexUid - The index UID
    * @returns Promise returning Index instance
    */
-  async getIndex<T extends Record<string, any> = Record<string, any>>(
+  async getIndex<T extends Record<string, unknown> = Record<string, unknown>>(
     indexUid: string,
   ): Promise<Index<T>> {
     return new Index<T>(this.config, indexUid).fetchInfo();
@@ -217,15 +217,15 @@ class Client {
    * @param config - Additional request configuration options
    * @returns Promise containing the search responses
    */
-  multiSearch<T extends Record<string, unknown> = Record<string, any>>(
+  multiSearch<T extends Record<string, unknown> = Record<string, unknown>>(
     queries: MultiSearchParams,
     extraRequestInit?: ExtraRequestInit,
   ): Promise<MultiSearchResponse<T>>;
-  multiSearch<T extends Record<string, unknown> = Record<string, any>>(
+  multiSearch<T extends Record<string, unknown> = Record<string, unknown>>(
     queries: FederatedMultiSearchParams,
     extraRequestInit?: ExtraRequestInit,
   ): Promise<SearchResponse<T>>;
-  async multiSearch<T extends Record<string, unknown> = Record<string, any>>(
+  async multiSearch<T extends Record<string, unknown> = Record<string, unknown>>(
     queries: MultiSearchParams | FederatedMultiSearchParams,
     extraRequestInit?: ExtraRequestInit,
   ): Promise<MultiSearchResponse<T> | SearchResponse<T>> {
@@ -481,10 +481,6 @@ class Client {
 
   /**
    * Generate a tenant token
-   *
-   * @param apiKeyUid - The uid of the api key used as issuer of the token.
-   * @param searchRules - Search rules that are applied to every search.
-   * @param options - Token options to customize some aspect of the token.
    * @returns The token in JWT format.
    */
   generateTenantToken(): Promise<string> {

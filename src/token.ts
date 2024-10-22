@@ -2,7 +2,18 @@ import { Config, TokenSearchRules, TokenOptions } from "./types";
 import { MeiliSearchError } from "./errors";
 import { validateUuid4 } from "./utils";
 
-function encode64(data: any) {
+type EncodingPayload =
+  | {
+      alg: string;
+      typ: string;
+    }
+  | {
+      searchRules: TokenSearchRules;
+      apiKeyUid: string;
+      exp: number | undefined;
+    };
+
+function encode64(data: EncodingPayload) {
   return Buffer.from(JSON.stringify(data)).toString("base64");
 }
 

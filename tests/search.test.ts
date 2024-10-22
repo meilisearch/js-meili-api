@@ -1194,7 +1194,7 @@ describe.each([
 
     controller.abort();
 
-    searchPromise.catch((error: any) => {
+    searchPromise.catch((error) => {
       expect(error).toHaveProperty(
         "cause.message",
         "This operation was aborted",
@@ -1245,7 +1245,7 @@ describe.each([
       expect(response).toHaveProperty("query", searchQuery);
     });
 
-    searchBPromise.catch((error: any) => {
+    searchBPromise.catch((error) => {
       expect(error).toHaveProperty(
         "cause.message",
         "This operation was aborted",
