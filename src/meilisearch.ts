@@ -30,9 +30,10 @@ import {
   DeleteTasksQuery,
   MultiSearchParams,
   FederatedMultiSearchParams,
+  MultiSearchResponse,
+  SearchResponse,
   BatchesResults,
   BatchesQuery,
-  MultiSearchResponseOrSearchResponse,
 } from "./types";
 import { HttpRequests } from "./http-requests";
 import { TaskClient, Task } from "./task";
@@ -198,33 +199,37 @@ export class MeiliSearch {
   ///
 
   /**
-   * Perform multiple search queries.
-   *
-   * It is possible to make multiple search queries on the same index or on
-   * different ones
-   *
-   * @example
-   *
-   * ```ts
-   * client.multiSearch({
-   *   queries: [
-   *     { indexUid: "movies", q: "wonder" },
-   *     { indexUid: "books", q: "flower" },
-   *   ],
-   * });
-   * ```
+   * https://www.meilisearch.com/docs/reference/api/multi_search
    *
    * @param queries - Search queries
    * @param config - Additional request configuration options
    * @returns Promise containing the search responses
    */
-  async multiSearch<
-    T1 extends MultiSearchParams | FederatedMultiSearchParams,
-    T2 extends Record<string, unknown> = Record<string, any>,
+  readonly multiSearch = <
+    T extends Record<string, unknown> = Record<string, unknown>,
   >(
-    queries: T1,
+    ...params: [queries: MultiSearchParams, config?: Partial<Request>]
+  ) => this.#multiSearch<T>(...params) as Promise<MultiSearchResponse<T>>;
+
+  /**
+   * https://www.meilisearch.com/docs/reference/api/multi_search#federation
+   *
+   * @param queries - Search queries
+   * @param config - Additional request configuration options
+   * @returns Promise containing the search responses
+   */
+  readonly federatedMultiSearch = <
+    T extends Record<string, unknown> = Record<string, unknown>,
+  >(
+    ...params: [queries: FederatedMultiSearchParams, config?: Partial<Request>]
+  ) => this.#multiSearch<T>(...params) as Promise<SearchResponse<T>>;
+
+  async #multiSearch<
+    T extends Record<string, unknown> = Record<string, unknown>,
+  >(
+    queries: MultiSearchParams | FederatedMultiSearchParams,
     config?: Partial<Request>,
-  ): Promise<MultiSearchResponseOrSearchResponse<T1, T2>> {
+  ): Promise<MultiSearchResponse<T> | SearchResponse<T>> {
     const url = `multi-search`;
 
     return await this.httpRequest.post(url, queries, undefined, config);

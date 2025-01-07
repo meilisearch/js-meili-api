@@ -300,13 +300,6 @@ export type MultiSearchResponse<T = Record<string, any>> = {
   results: Array<MultiSearchResult<T>>;
 };
 
-export type MultiSearchResponseOrSearchResponse<
-  T1 extends FederatedMultiSearchParams | MultiSearchParams,
-  T2 extends Record<string, unknown> = Record<string, any>,
-> = T1 extends FederatedMultiSearchParams
-  ? SearchResponse<T2>
-  : MultiSearchResponse<T2>;
-
 export type FieldDistribution = {
   [field: string]: number;
 };
