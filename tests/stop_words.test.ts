@@ -29,7 +29,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: Get default stop words`, async () => {
       const client = await getClient(permission);
-      const response: string[] = await client.index(index.uid).getStopWords();
+      const response = await client.index(index.uid).getStopWords();
 
       expect(response).toEqual([]);
     });

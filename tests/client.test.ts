@@ -1,4 +1,14 @@
-import { afterAll, expect, test, describe, beforeEach } from "vitest";
+import {
+  afterAll,
+  expect,
+  test,
+  describe,
+  beforeEach,
+  vi,
+  type MockInstance,
+  beforeAll,
+  assert,
+} from "vitest";
 import type { Health, Version, Stats } from "../src/index.js";
 import { ErrorStatusCode, TaskTypes } from "../src/index.js";
 import { PACKAGE_VERSION } from "../src/package-version.js";
@@ -51,50 +61,89 @@ describe.each([
     expect(health).toBe(true);
   });
 
-  test(`${permission} key: Create client with custom headers (object)`, async () => {
-    const key = await getKey(permission);
-    const client = new MeiliSearch({
-      ...config,
-      apiKey: key,
-      requestConfig: {
-        headers: {
-          "Hello-There!": "General Kenobi",
+  describe("Header tests", () => {
+    let fetchSpy: MockInstance<typeof fetch>;
+
+    beforeAll(() => {
+      fetchSpy = vi.spyOn(globalThis, "fetch");
+    });
+
+    afterAll(() => fetchSpy.mockRestore());
+
+    test(`${permission} key: Create client with custom headers (object)`, async () => {
+      const key = await getKey(permission);
+      const client = new MeiliSearch({
+        ...config,
+        apiKey: key,
+        requestInit: {
+          headers: {
+            "Hello-There!": "General Kenobi",
+          },
         },
-      },
-    });
-    expect(client.httpRequest.headers["Hello-There!"]).toBe("General Kenobi");
-    const health = await client.isHealthy();
-    expect(health).toBe(true);
-  });
+      });
 
-  test(`${permission} key: Create client with custom headers (array)`, async () => {
-    const key = await getKey(permission);
-    const client = new MeiliSearch({
-      ...config,
-      apiKey: key,
-      requestConfig: {
-        headers: [["Hello-There!", "General Kenobi"]],
-      },
-    });
-    expect(client.httpRequest.headers["Hello-There!"]).toBe("General Kenobi");
-    const health = await client.isHealthy();
-    expect(health).toBe(true);
-  });
+      await client.multiSearch(
+        { queries: [] },
+        { headers: { "Jane-Doe": "John Doe" } },
+      );
 
-  test(`${permission} key: Create client with custom headers (Headers)`, async () => {
-    const key = await getKey(permission);
-    const headers = new Headers();
-    headers.append("Hello-There!", "General Kenobi");
-    const client = new MeiliSearch({
-      ...config,
-      apiKey: key,
-      requestConfig: {
-        headers,
-      },
+      assert.isDefined(fetchSpy.mock.lastCall);
+      const [, requestInit] = fetchSpy.mock.lastCall!;
+
+      assert.isDefined(requestInit?.headers);
+      assert.instanceOf(requestInit!.headers, Headers);
+
+      const headers = requestInit!.headers! as Headers;
+
+      assert.strictEqual(headers.get("Hello-There!"), "General Kenobi");
+      assert.strictEqual(headers.get("Jane-Doe"), "John Doe");
     });
-    expect(client.httpRequest.headers["hello-there!"]).toBe("General Kenobi");
-    const health = await client.isHealthy();
-    expect(health).toBe(true);
+
+    test(`${permission} key: Create client with custom headers (array)`, async () => {
+      const key = await getKey(permission);
+      const client = new MeiliSearch({
+        ...config,
+        apiKey: key,
+        requestInit: {
+          headers: [["Hello-There!", "General Kenobi"]],
+        },
+      });
+
+      assert.isTrue(await client.isHealthy());
+
+      assert.isDefined(fetchSpy.mock.lastCall);
+      const [, requestInit] = fetchSpy.mock.lastCall!;
+
+      assert.isDefined(requestInit?.headers);
+      assert.instanceOf(requestInit!.headers, Headers);
+      assert.strictEqual(
+        (requestInit!.headers! as Headers).get("Hello-There!"),
+        "General Kenobi",
+      );
+    });
+
+    test(`${permission} key: Create client with custom headers (Headers)`, async () => {
+      const key = await getKey(permission);
+      const headers = new Headers();
+      headers.set("Hello-There!", "General Kenobi");
+      const client = new MeiliSearch({
+        ...config,
+        apiKey: key,
+        requestInit: { headers },
+      });
+
+      assert.isTrue(await client.isHealthy());
+
+      assert.isDefined(fetchSpy.mock.lastCall);
+      const [, requestInit] = fetchSpy.mock.lastCall!;
+
+      assert.isDefined(requestInit?.headers);
+      assert.instanceOf(requestInit!.headers, Headers);
+      assert.strictEqual(
+        (requestInit!.headers! as Headers).get("Hello-There!"),
+        "General Kenobi",
+      );
+    });
   });
 
   test(`${permission} key: No double slash when on host with domain and path and trailing slash`, async () => {
@@ -187,7 +236,7 @@ describe.each([
   test(`${permission} key: Empty string host should throw an error`, () => {
     expect(() => {
       new MeiliSearch({ host: "" });
-    }).toThrow("The provided host is not valid.");
+    }).toThrow("The provided host is not valid");
   });
 });
 
@@ -203,13 +252,13 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
       const client = new MeiliSearch({
         ...config,
         apiKey: key,
-        requestConfig: {
+        requestInit: {
           headers: {
             "Hello-There!": "General Kenobi",
           },
         },
       });
-      expect(client.config.requestConfig?.headers).toStrictEqual({
+      expect(client.config.requestInit?.headers).toStrictEqual({
         "Hello-There!": "General Kenobi",
       });
       const health = await client.isHealthy();
@@ -256,45 +305,79 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
       expect(documents.length).toBe(1);
     });
 
-    test(`${permission} key: Create client with no custom client agents`, async () => {
-      const key = await getKey(permission);
-      const client = new MeiliSearch({
-        ...config,
-        apiKey: key,
-        requestConfig: {
-          headers: {},
-        },
+    describe("Header tests", () => {
+      let fetchSpy: MockInstance<typeof fetch>;
+
+      beforeAll(() => {
+        fetchSpy = vi.spyOn(globalThis, "fetch");
       });
 
-      expect(client.httpRequest.headers["X-Meilisearch-Client"]).toStrictEqual(
-        `Meilisearch JavaScript (v${PACKAGE_VERSION})`,
-      );
-    });
+      afterAll(() => fetchSpy.mockRestore());
 
-    test(`${permission} key: Create client with empty custom client agents`, async () => {
-      const key = await getKey(permission);
-      const client = new MeiliSearch({
-        ...config,
-        apiKey: key,
-        clientAgents: [],
+      test(`${permission} key: Create client with no custom client agents`, async () => {
+        const key = await getKey(permission);
+        const client = new MeiliSearch({
+          ...config,
+          apiKey: key,
+          requestInit: {
+            headers: {},
+          },
+        });
+
+        assert.isTrue(await client.isHealthy());
+
+        assert.isDefined(fetchSpy.mock.lastCall);
+        const [, requestInit] = fetchSpy.mock.lastCall!;
+
+        assert.isDefined(requestInit?.headers);
+        assert.instanceOf(requestInit!.headers, Headers);
+        assert.strictEqual(
+          (requestInit!.headers! as Headers).get("X-Meilisearch-Client"),
+          `Meilisearch JavaScript (v${PACKAGE_VERSION})`,
+        );
       });
 
-      expect(client.httpRequest.headers["X-Meilisearch-Client"]).toStrictEqual(
-        `Meilisearch JavaScript (v${PACKAGE_VERSION})`,
-      );
-    });
+      test(`${permission} key: Create client with empty custom client agents`, async () => {
+        const key = await getKey(permission);
+        const client = new MeiliSearch({
+          ...config,
+          apiKey: key,
+          clientAgents: [],
+        });
 
-    test(`${permission} key: Create client with custom client agents`, async () => {
-      const key = await getKey(permission);
-      const client = new MeiliSearch({
-        ...config,
-        apiKey: key,
-        clientAgents: ["random plugin 1", "random plugin 2"],
+        assert.isTrue(await client.isHealthy());
+
+        assert.isDefined(fetchSpy.mock.lastCall);
+        const [, requestInit] = fetchSpy.mock.lastCall!;
+
+        assert.isDefined(requestInit?.headers);
+        assert.instanceOf(requestInit!.headers, Headers);
+        assert.strictEqual(
+          (requestInit!.headers! as Headers).get("X-Meilisearch-Client"),
+          `Meilisearch JavaScript (v${PACKAGE_VERSION})`,
+        );
       });
 
-      expect(client.httpRequest.headers["X-Meilisearch-Client"]).toStrictEqual(
-        `random plugin 1 ; random plugin 2 ; Meilisearch JavaScript (v${PACKAGE_VERSION})`,
-      );
+      test(`${permission} key: Create client with custom client agents`, async () => {
+        const key = await getKey(permission);
+        const client = new MeiliSearch({
+          ...config,
+          apiKey: key,
+          clientAgents: ["random plugin 1", "random plugin 2"],
+        });
+
+        assert.isTrue(await client.isHealthy());
+
+        assert.isDefined(fetchSpy.mock.lastCall);
+        const [, requestInit] = fetchSpy.mock.lastCall!;
+
+        assert.isDefined(requestInit?.headers);
+        assert.instanceOf(requestInit!.headers, Headers);
+        assert.strictEqual(
+          (requestInit!.headers! as Headers).get("X-Meilisearch-Client"),
+          `random plugin 1 ; random plugin 2 ; Meilisearch JavaScript (v${PACKAGE_VERSION})`,
+        );
+      });
     });
 
     describe("Test on indexes methods", () => {
