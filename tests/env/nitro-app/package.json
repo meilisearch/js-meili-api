@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "test": "yarn build && jest",
+    "test": "pnpm build && jest",
     "dev": "npx nitropack dev",
     "build": "npx nitropack build",
     "preview": "node .output/server/index.mjs"
