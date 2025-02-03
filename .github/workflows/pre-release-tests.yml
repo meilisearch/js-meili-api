@@ -5,12 +5,12 @@ name: Pre-Release Tests
 on:
   pull_request:
     branches:
-      - 'bump-meilisearch-v**'
-      - 'pre-release-beta/**'
+      - "bump-meilisearch-v**"
+      - "pre-release-beta/**"
   push:
     branches:
-      - 'bump-meilisearch-v**'
-      - 'pre-release-beta/**'
+      - "bump-meilisearch-v**"
+      - "pre-release-beta/**"
 
 jobs:
   meilisearch-version:
@@ -28,28 +28,25 @@ jobs:
   integration_tests:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || startsWith(github.base_ref, 'bump-meilisearch-v') || startsWith(github.base_ref, 'pre-release-beta')
-    needs: ['meilisearch-version']
+    needs: ["meilisearch-version"]
     services:
       meilisearch:
         image: getmeili/meilisearch:${{ needs.meilisearch-version.outputs.version }}
         env:
-          MEILI_MASTER_KEY: 'masterKey'
-          MEILI_NO_ANALYTICS: 'true'
+          MEILI_MASTER_KEY: "masterKey"
+          MEILI_NO_ANALYTICS: "true"
         ports:
-          - '7700:7700'
+          - "7700:7700"
     strategy:
       matrix:
-        node-version: ['18', '20', '22']
+        node-version: ["18", "20", "22"]
     name: integration-tests (Node.js ${{ matrix.node-version }})
     steps:
       - uses: actions/checkout@v4
-      - name: Setup node
-        uses: actions/setup-node@v4
+      - uses: ./.github/actions/set-up-node
         with:
           node-version: ${{ matrix.node-version }}
-          cache: pnpm
-      - name: Install dependencies
-        run: pnpm install
+
       - name: Run tests
         run: pnpm test
       - name: Build project

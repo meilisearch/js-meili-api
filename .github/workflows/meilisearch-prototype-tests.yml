@@ -48,19 +48,10 @@ jobs:
     #      https://docs.github.com/en/actions/sharing-automations/reusing-workflows
     #      https://docs.github.com/en/actions/sharing-automations/creating-actions/creating-a-composite-action
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/set-up-node
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'pnpm'
-      - name: Install dependencies
-        run: pnpm install
 
       - name: Run tests
         run: pnpm test

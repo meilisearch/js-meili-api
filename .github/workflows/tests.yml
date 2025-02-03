@@ -27,24 +27,21 @@ jobs:
       meilisearch:
         image: getmeili/meilisearch:latest
         env:
-          MEILI_MASTER_KEY: 'masterKey'
-          MEILI_NO_ANALYTICS: 'true'
+          MEILI_MASTER_KEY: "masterKey"
+          MEILI_NO_ANALYTICS: "true"
         ports:
-          - '7700:7700'
+          - "7700:7700"
     strategy:
       fail-fast: false
       matrix:
-        node-version: ['18', '20', '22']
+        node-version: ["18", "20", "22"]
     name: integration-tests (Node.js ${{ matrix.node-version }})
     steps:
       - uses: actions/checkout@v4
-      - name: Setup node
-        uses: actions/setup-node@v4
+      - uses: ./.github/actions/set-up-node
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'pnpm'
-      - name: Install dependencies
-        run: pnpm install
+
       - name: Run tests
         run: pnpm test
       - name: Build project
@@ -66,13 +63,8 @@ jobs:
     name: style-check
     steps:
       - uses: actions/checkout@v4
-      - name: Setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: 'pnpm'
-      - name: Install dependencies
-        run: pnpm install
+      - uses: ./.github/actions/set-up-node
+
       - name: Run code style check
         run: pnpm style
       - name: Run yaml style check
@@ -84,13 +76,8 @@ jobs:
     name: types-check
     steps:
       - uses: actions/checkout@v4
-      - name: Setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: 'pnpm'
-      - name: Install dependencies
-        run: pnpm install
+      - uses: ./.github/actions/set-up-node
+
       - name: Build project
         run: pnpm build
       - name: Run types check
