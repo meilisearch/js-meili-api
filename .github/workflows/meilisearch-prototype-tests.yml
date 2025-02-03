@@ -5,10 +5,10 @@ name: Meilisearch prototype tests
 on:
   pull_request:
     branches:
-      - 'prototype-beta/**'
+      - "prototype-beta/**"
   push:
     branches:
-      - 'prototype-beta/**'
+      - "prototype-beta/**"
 
 jobs:
   meilisearch-version:
@@ -31,20 +31,20 @@ jobs:
           echo "meilisearch_version=$MEILISEARCH_VERSION" >> $GITHUB_OUTPUT
   integration_tests:
     runs-on: ubuntu-latest
-    needs: ['meilisearch-version']
+    needs: ["meilisearch-version"]
     services:
       meilisearch:
         image: getmeili/meilisearch:${{ needs.meilisearch-version.outputs.version }}
         env:
-          MEILI_MASTER_KEY: 'masterKey'
-          MEILI_NO_ANALYTICS: 'true'
+          MEILI_MASTER_KEY: "masterKey"
+          MEILI_NO_ANALYTICS: "true"
         ports:
-          - '7700:7700'
+          - "7700:7700"
     strategy:
       matrix:
-        node-version: ['18', '20', '22']
+        node-version: ["18", "20", "22"]
     name: integration-tests (Node.js ${{ matrix.node-version }})
-    #TODO: https://docs.github.com/en/actions/sharing-automations/avoiding-duplication 
+    #TODO: https://docs.github.com/en/actions/sharing-automations/avoiding-duplication
     #      https://docs.github.com/en/actions/sharing-automations/reusing-workflows
     #      https://docs.github.com/en/actions/sharing-automations/creating-actions/creating-a-composite-action
     steps:
