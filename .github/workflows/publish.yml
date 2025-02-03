@@ -18,7 +18,6 @@ jobs:
 
       - uses: ./.github/actions/set-up-node
         with:
-          node-version: 22
           registry-url: https://registry.npmjs.org/
 
       - name: Build meilisearch-js
