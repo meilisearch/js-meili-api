@@ -18,4 +18,5 @@ runs:
         registry-url: ${{ inputs.registry-url }}
         cache: "pnpm"
     - name: Install dependencies
+      shell: bash
       run: pnpm install
