@@ -44,9 +44,6 @@ jobs:
       matrix:
         node-version: ["18", "20", "22"]
     name: integration-tests (Node.js ${{ matrix.node-version }})
-    #TODO: https://docs.github.com/en/actions/sharing-automations/avoiding-duplication
-    #      https://docs.github.com/en/actions/sharing-automations/reusing-workflows
-    #      https://docs.github.com/en/actions/sharing-automations/creating-actions/creating-a-composite-action
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/set-up-node
