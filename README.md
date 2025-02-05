@@ -17,9 +17,7 @@
 <p align="center">
   <a href="https://www.npmjs.com/package/meilisearch"><img src="https://img.shields.io/npm/v/meilisearch.svg" alt="npm version"></a>
   <a href="https://github.com/meilisearch/meilisearch-js/actions"><img src="https://github.com/meilisearch/meilisearch-js/workflows/Tests/badge.svg" alt="Tests"></a>
-  <a href="https://codecov.io/gh/meilisearch/meilisearch-js">
-    <img src="https://codecov.io/github/meilisearch/meilisearch-js/coverage.svg?branch=main" alt="Codecov">
-  </a>
+  <a href="https://codecov.io/gh/meilisearch/meilisearch-js"><img src="https://codecov.io/github/meilisearch/meilisearch-js/coverage.svg?branch=main" alt="Codecov"></a>
   <a href="https://github.com/prettier/prettier"><img src="https://img.shields.io/badge/styled_with-prettier-ff69b4.svg" alt="Prettier"></a>
   <a href="https://github.com/meilisearch/meilisearch-js/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-informational" alt="License"></a>
   <a href="https://ms-bors.herokuapp.com/repositories/10"><img src="https://bors.tech/images/badge_small.svg" alt="Bors enabled"></a>
@@ -49,15 +47,22 @@ For general information on how to use Meilisearch—such as our API reference, t
 
 ## 🔧 Installation
 
-We recommend installing `meilisearch-js` in your project with your package manager of choice.
+This package is published to [npm](https://www.npmjs.com/package/meilisearch).
+
+Installing with `npm`:
 
 ```sh
-npm install meilisearch
+npm i meilisearch
 ```
 
-`meilisearch-js` officially supports `node` versions 18 Maintenance, 20 Maintenance and 22 LTS.
+> [!NOTE]
+>
+> Node.js
+> [LTS and Maintenance versions](https://github.com/nodejs/Release?tab=readme-ov-file#release-schedule)
+> are supported and tested. Other versions may or may not work.
 
-Instead of using a package manager, you may also import the library directly into your [HTML via a CDN](#include-script-tag).
+Other runtimes, like Deno and Bun, aren't tested, but if they do not work with
+this package, please open an issue.
 
 ### Run Meilisearch <!-- omit in toc -->
 
@@ -69,48 +74,70 @@ Instead of using a package manager, you may also import the library directly int
 
 After installing `meilisearch-js`, you must import it into your application. There are many ways of doing that depending on your development environment.
 
+<details>
+<summary><h4>⚠️ If any issues arise importing <code>meilisearch/token</code></h4></summary>
+
+- [TypeScript >= 4.7](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-7.html)
+  is required
+- [`tsconfig.json` has to be set up correctly](https://www.typescriptlang.org/docs/handbook/modules/reference.html#packagejson-exports)
+  - take a look at
+    [Centralized Recommendations for TSConfig bases](https://github.com/tsconfig/bases?tab=readme-ov-file)
+
+</details>
+
 > [!WARNING]
-> - [default export](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export#using_the_default_export) is deprecated and will be removed in a future version https://github.com/meilisearch/meilisearch-js/issues/1789
-> - exports will stop being directly available on the global object (usually `window`) https://github.com/meilisearch/meilisearch-js/issues/1806
+>
+> - [default export](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export#using_the_default_export)
+>   is deprecated and will be removed in a future version |
+>   [Issue](https://github.com/meilisearch/meilisearch-js/issues/1789)
+> - regarding usage of package's UMD version via `script src`, exports will stop
+>   being directly available on the
+>   [global object](https://developer.mozilla.org/en-US/docs/Glossary/Global_object)
+>   | [Issue](https://github.com/meilisearch/meilisearch-js/issues/1806)
 
 #### `import` syntax <!-- omit in toc -->
 
 Usage in an ES module environment:
 
-```javascript
-import { MeiliSearch } from 'meilisearch'
+```js
+import { MeiliSearch } from "meilisearch";
 
 const client = new MeiliSearch({
-  host: 'http://127.0.0.1:7700',
-  apiKey: 'masterKey',
-})
+  host: "http://127.0.0.1:7700",
+  apiKey: "masterKey",
+});
 ```
 
 #### `<script>` tag <!-- omit in toc -->
 
-Usage in an HTML (or alike) file:
+This package also contains a [UMD](https://stackoverflow.com/a/77284527) bundled
+version, which in this case is meant to be used in a
+[`script src`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script#src)
+tag:
 
 ```html
-<script src='https://cdn.jsdelivr.net/npm/meilisearch@latest/dist/bundles/meilisearch.umd.js'></script>
+<script src="https://www.unpkg.com/meilisearch/dist/umd/index.min.js"></script>
 <script>
-  const client = new meilisearch.MeiliSearch({
-    host: 'http://127.0.0.1:7700',
-    apiKey: 'masterKey',
-  })
+    const client = new meilisearch.MeiliSearch(/* ... */);
+    // ...
 </script>
 ```
+
+But keep in mind that each CDN ([JSDELIVR](https://www.jsdelivr.com),
+[ESM.SH](https://esm.sh/), etc.) provide more ways to import packages, make sure
+to read their documentation.
 
 #### `require` syntax <!-- omit in toc -->
 
 Usage in a back-end node.js or another environment supporting CommonJS modules:
 
-```javascript
-const { MeiliSearch } = require('meilisearch')
+```js
+const { MeiliSearch } = require("meilisearch");
 
 const client = new MeiliSearch({
-  host: 'http://127.0.0.1:7700',
-  apiKey: 'masterKey',
-})
+  host: "http://127.0.0.1:7700",
+  apiKey: "masterKey",
+});
 ```
 
 #### React Native <!-- omit in toc -->
@@ -122,12 +149,12 @@ To use `meilisearch-js` with React Native, you must also install [react-native-u
 Usage in a Deno environment:
 
 ```js
-import { MeiliSearch } from "https://esm.sh/meilisearch"
+import { MeiliSearch } from "npm:meilisearch";
 
 const client = new MeiliSearch({
-  host: 'http://127.0.0.1:7700',
-  apiKey: 'masterKey',
-})
+  host: "http://127.0.0.1:7700",
+  apiKey: "masterKey",
+});
 ```
 
 ## 🚀 Getting started
@@ -338,7 +365,6 @@ index
 
 controller.abort()
 ```
-
 
 ### Using Meilisearch behind a proxy <!-- omit in toc -->
 
@@ -1159,6 +1185,7 @@ client.createDump(): Promise<EnqueuedTask>
 ```ts
 client.createSnapshot(): Promise<EnqueuedTask>
 ```
+
 ---
 
 Meilisearch provides and maintains many SDKs and integration tools like this one. We want to provide everyone with an **amazing search experience for any kind of project**. For a full overview of everything we create and maintain, take a look at the [integration-guides](https://github.com/meilisearch/integration-guides) repository.
