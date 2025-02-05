@@ -338,7 +338,7 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
-"@eslint/js@9.19.0", "@eslint/js@^9.16.0":
+"@eslint/js@9.19.0", "@eslint/js@^9.19.0":
   version "9.19.0"
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-9.19.0.tgz#51dbb140ed6b49d05adc0b171c41e1a8713b7789"
   integrity sha512-rbq9/g38qjfqFLOVPvwjIvFFdNziEC5S65jmjPw5r6A//QH+W91akh9irMwjDN8zKUTak6W9EsAv4m/7Wnw0UQ==
@@ -740,7 +740,7 @@
     semver "^7.6.0"
     ts-api-utils "^2.0.0"
 
-"@typescript-eslint/utils@8.22.0", "@typescript-eslint/utils@^8.19.0":
+"@typescript-eslint/utils@8.22.0", "@typescript-eslint/utils@^8.22.0":
   version "8.22.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/utils/-/utils-8.22.0.tgz#c8cc4e52a9c711af8a741a82dc5d7242b7a8dd44"
   integrity sha512-T8oc1MbF8L+Bk2msAvCUzjxVB2Z2f+vXYfcucE2wOmYs7ZUwco5Ep0fYZw8quNwOiw9K8GYVL+Kgc2pETNTLOg==
