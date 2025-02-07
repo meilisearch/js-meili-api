@@ -1,0 +1,17 @@
+name: TODO Name Me Properly
+# TODO: Maybe we want to do this every time release drafter runs, read more: https://github.com/marketplace/actions/create-pull-request#action-behaviour
+on:
+  workflow_dispatch:
+
+jobs:
+  update_version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bump version in package files and create PR
+        uses: ./.github/actions/bump-version
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
