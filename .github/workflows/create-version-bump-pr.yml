@@ -1,5 +1,4 @@
-name: TODO Name Me Properly
-# TODO: Maybe we want to do this every time release drafter runs, read more: https://github.com/marketplace/actions/create-pull-request#action-behaviour
+name: Create Version Bump PR
 on:
   workflow_dispatch:
 
