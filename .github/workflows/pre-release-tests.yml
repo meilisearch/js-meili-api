@@ -1,6 +1,9 @@
 # Testing the code base against the Meilisearch pre-releases
 name: Pre-Release Tests
 
+env:
+  HUSKY: 0
+
 # Will only run for PRs and pushes to bump-meilisearch-v*
 on:
   pull_request:

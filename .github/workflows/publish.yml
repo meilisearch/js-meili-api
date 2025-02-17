@@ -3,6 +3,9 @@ on:
   release:
     types: [published]
 
+env:
+  HUSKY: 0
+
 jobs:
   publish-npm:
     runs-on: ubuntu-latest

@@ -1,5 +1,8 @@
 name: Build documentation
 
+env:
+  HUSKY: 0
+
 on:
   push:
     branches:

@@ -1,6 +1,9 @@
 # Testing the code base against a specific Meilisearch feature
 name: Meilisearch prototype tests
 
+env:
+  HUSKY: 0
+
 # Will only run for PRs and pushes to *-beta
 on:
   pull_request:
