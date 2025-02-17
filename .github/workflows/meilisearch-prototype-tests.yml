@@ -5,10 +5,10 @@ name: Meilisearch prototype tests
 on:
   pull_request:
     branches:
-      - 'prototype-beta/**'
+      - "prototype-beta/**"
   push:
     branches:
-      - 'prototype-beta/**'
+      - "prototype-beta/**"
 
 jobs:
   meilisearch-version:
@@ -31,18 +31,18 @@ jobs:
           echo "meilisearch_version=$MEILISEARCH_VERSION" >> $GITHUB_OUTPUT
   integration_tests:
     runs-on: ubuntu-latest
-    needs: ['meilisearch-version']
+    needs: ["meilisearch-version"]
     services:
       meilisearch:
         image: getmeili/meilisearch:${{ needs.meilisearch-version.outputs.version }}
         env:
-          MEILI_MASTER_KEY: 'masterKey'
-          MEILI_NO_ANALYTICS: 'true'
+          MEILI_MASTER_KEY: "masterKey"
+          MEILI_NO_ANALYTICS: "true"
         ports:
-          - '7700:7700'
+          - "7700:7700"
     strategy:
       matrix:
-        node: ['18', '20', '22']
+        node: ["18", "20", "22"]
     name: integration-tests (Node.js ${{ matrix.node }})
     steps:
       - uses: actions/checkout@v4

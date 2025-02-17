@@ -1,20 +1,20 @@
 version: 2
 updates:
-  - package-ecosystem: 'github-actions'
-    directory: '/'
+  - package-ecosystem: "github-actions"
+    directory: "/"
     schedule:
-      interval: 'monthly'
+      interval: "monthly"
     labels:
-      - 'skip-changelog'
-      - 'dependencies'
+      - "skip-changelog"
+      - "dependencies"
     rebase-strategy: disabled
 
   - package-ecosystem: npm
-    directory: '/'
+    directory: "/"
 
     schedule:
-      interval: 'monthly'
-      time: '04:00'
+      interval: "monthly"
+      time: "04:00"
     open-pull-requests-limit: 10
     labels:
       - skip-changelog

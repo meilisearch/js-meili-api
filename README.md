@@ -68,7 +68,7 @@ this package, please open an issue.
 
 ⚡️ **Launch, scale, and streamline in minutes with Meilisearch Cloud**—no maintenance, no commitment, cancel anytime. [Try it free now](https://cloud.meilisearch.com/login?utm_campaign=oss&utm_source=github&utm_medium=meilisearch-js).
 
-🪨  Prefer to self-host? [Download and deploy](https://www.meilisearch.com/docs/learn/self_hosted/getting_started_with_self_hosted_meilisearch?utm_campaign=oss&utm_source=github&utm_medium=meilisearch-js) our fast, open-source search engine on your own infrastructure.
+🪨 Prefer to self-host? [Download and deploy](https://www.meilisearch.com/docs/learn/self_hosted/getting_started_with_self_hosted_meilisearch?utm_campaign=oss&utm_source=github&utm_medium=meilisearch-js) our fast, open-source search engine on your own infrastructure.
 
 ### Import <!-- omit in toc -->
 
@@ -118,8 +118,8 @@ tag:
 ```html
 <script src="https://www.unpkg.com/meilisearch/dist/umd/index.min.js"></script>
 <script>
-    const client = new meilisearch.MeiliSearch(/* ... */);
-    // ...
+  const client = new meilisearch.MeiliSearch(/* ... */);
+  // ...
 </script>
 ```
 
@@ -164,33 +164,36 @@ Take a look at the [playground](./playgrounds/javascript/src/meilisearch.ts) for
 ### Add documents <!-- omit in toc -->
 
 ```js
-const { MeiliSearch } = require('meilisearch')
+const { MeiliSearch } = require("meilisearch");
 // Or if you are in a ES environment
-import { MeiliSearch } from 'meilisearch'
-
-;(async () => {
+import { MeiliSearch } from "meilisearch";
+(async () => {
   const client = new MeiliSearch({
-    host: 'http://127.0.0.1:7700',
-    apiKey: 'masterKey',
-  })
+    host: "http://127.0.0.1:7700",
+    apiKey: "masterKey",
+  });
 
   // An index is where the documents are stored.
-  const index = client.index('movies')
+  const index = client.index("movies");
 
   const documents = [
-      { id: 1, title: 'Carol', genres: ['Romance', 'Drama'] },
-      { id: 2, title: 'Wonder Woman', genres: ['Action', 'Adventure'] },
-      { id: 3, title: 'Life of Pi', genres: ['Adventure', 'Drama'] },
-      { id: 4, title: 'Mad Max: Fury Road', genres: ['Adventure', 'Science Fiction'] },
-      { id: 5, title: 'Moana', genres: ['Fantasy', 'Action']},
-      { id: 6, title: 'Philadelphia', genres: ['Drama'] },
-  ]
+    { id: 1, title: "Carol", genres: ["Romance", "Drama"] },
+    { id: 2, title: "Wonder Woman", genres: ["Action", "Adventure"] },
+    { id: 3, title: "Life of Pi", genres: ["Adventure", "Drama"] },
+    {
+      id: 4,
+      title: "Mad Max: Fury Road",
+      genres: ["Adventure", "Science Fiction"],
+    },
+    { id: 5, title: "Moana", genres: ["Fantasy", "Action"] },
+    { id: 6, title: "Philadelphia", genres: ["Drama"] },
+  ];
 
   // If the index 'movies' does not exist, Meilisearch creates it when you first add the documents.
-  let response = await index.addDocuments(documents)
+  let response = await index.addDocuments(documents);
 
-  console.log(response) // => { "uid": 0 }
-})()
+  console.log(response); // => { "uid": 0 }
+})();
 ```
 
 Tasks such as document addition always return a unique identifier. You can use this identifier `taskUid` to check the status (`enqueued`, `canceled`, `processing`, `succeeded` or `failed`) of a [task](https://www.meilisearch.com/docs/reference/api/tasks).
@@ -199,8 +202,8 @@ Tasks such as document addition always return a unique identifier. You can use t
 
 ```javascript
 // Meilisearch is typo-tolerant:
-const search = await index.search('philoudelphia')
-console.log(search)
+const search = await index.search("philoudelphia");
+console.log(search);
 ```
 
 Output:
@@ -227,12 +230,9 @@ Output:
 `meilisearch-js` supports all [search parameters](https://www.meilisearch.com/docs/reference/api/search#search-parameters) described in our main documentation website.
 
 ```javascript
-await index.search(
-  'wonder',
-  {
-    attributesToHighlight: ['*']
-  }
-)
+await index.search("wonder", {
+  attributesToHighlight: ["*"],
+});
 ```
 
 ```json
@@ -262,10 +262,7 @@ await index.search(
 To enable filtering, you must first add your attributes to the [`filterableAttributes` index setting](https://www.meilisearch.com/docs/reference/api/settings#filterable-attributes).
 
 ```js
-await index.updateFilterableAttributes([
-    'id',
-    'genres'
-  ])
+await index.updateFilterableAttributes(["id", "genres"]);
 ```
 
 You only need to perform this operation once per index.
@@ -275,12 +272,9 @@ Note that Meilisearch rebuilds your index whenever you update `filterableAttribu
 After you configured `filterableAttributes`, you can use the [`filter` search parameter](https://www.meilisearch.com/docs/reference/api/search#filter) to refine your search:
 
 ```js
-await index.search(
-  'wonder',
-  {
-    filter: ['id > 1 AND genres = Action']
-  }
-)
+await index.search("wonder", {
+  filter: ["id > 1 AND genres = Action"],
+});
 ```
 
 ```json
@@ -289,7 +283,7 @@ await index.search(
     {
       "id": 2,
       "title": "Wonder Woman",
-      "genres": ["Action","Adventure"]
+      "genres": ["Action", "Adventure"]
     }
   ],
   "offset": 0,
@@ -305,13 +299,10 @@ await index.search(
 Placeholder search makes it possible to receive hits based on your parameters without having any query (`q`). For example, in a movies database you can run an empty query to receive all results filtered by `genre`.
 
 ```javascript
-await index.search(
-  '',
-  {
-    filter: ['genres = fantasy'],
-    facets: ['genres']
-  }
-)
+await index.search("", {
+  filter: ["genres = fantasy"],
+  facets: ["genres"],
+});
 ```
 
 ```json
@@ -320,12 +311,12 @@ await index.search(
     {
       "id": 2,
       "title": "Wonder Woman",
-      "genres": ["Action","Adventure"]
+      "genres": ["Action", "Adventure"]
     },
     {
       "id": 5,
       "title": "Moana",
-      "genres": ["Fantasy","Action"]
+      "genres": ["Fantasy", "Action"]
     }
   ],
   "offset": 0,
@@ -350,20 +341,24 @@ Note that to enable faceted search on your dataset you need to add `genres` to t
 You can abort a pending search request by providing an [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) to the request.
 
 ```js
-const controller = new AbortController()
+const controller = new AbortController();
 
 index
-  .search('wonder', {}, {
-    signal: controller.signal,
-  })
+  .search(
+    "wonder",
+    {},
+    {
+      signal: controller.signal,
+    },
+  )
   .then((response) => {
     /** ... */
   })
   .catch((e) => {
     /** Catch AbortError here. */
-  })
+  });
 
-controller.abort()
+controller.abort();
 ```
 
 ### Using Meilisearch behind a proxy <!-- omit in toc -->
@@ -374,15 +369,15 @@ You can provide a custom request configuration. for example, with custom headers
 
 ```ts
 const client: MeiliSearch = new MeiliSearch({
-  host: 'http://localhost:3000/api/meilisearch/proxy',
+  host: "http://localhost:3000/api/meilisearch/proxy",
   requestConfig: {
     headers: {
-      Authorization: AUTH_TOKEN
+      Authorization: AUTH_TOKEN,
     },
     // OR
-    credentials: 'include'
-  }
-})
+    credentials: "include",
+  },
+});
 ```
 
 #### Custom http client <!-- omit in toc -->
@@ -391,18 +386,18 @@ You can use your own HTTP client, for example, with [`axios`](https://github.com
 
 ```ts
 const client: MeiliSearch = new MeiliSearch({
-  host: 'http://localhost:3000/api/meilisearch/proxy',
+  host: "http://localhost:3000/api/meilisearch/proxy",
   httpClient: async (url, opts) => {
     const response = await $axios.request({
       url,
       data: opts?.body,
       headers: opts?.headers,
-      method: (opts?.method?.toLocaleUpperCase() as Method) ?? 'GET'
-    })
+      method: (opts?.method?.toLocaleUpperCase() as Method) ?? "GET",
+    });
 
-    return response.data
-  }
-})
+    return response.data;
+  },
+});
 ```
 
 ## 🤖 Compatibility with Meilisearch
@@ -564,9 +559,7 @@ client.index('myIndex').getTasks(parameters: TasksQuery): Promise<TasksResults>
 client.index('myIndex').getTask(uid: number): Promise<Task>
 ```
 
-
 #### Wait for one task
-
 
 ##### Using the client
 
@@ -622,7 +615,6 @@ client.getIndexes(parameters: IndexesQuery): Promise<IndexesResults<Index[]>>
 client.getRawIndexes(parameters: IndexesQuery): Promise<IndexesResults<IndexObject[]>>
 ```
 
-
 #### [Create a new index](https://www.meilisearch.com/docs/reference/api/indexes#create-an-index)
 
 ```ts
@@ -670,11 +662,13 @@ client.index('myIndex').update(data: IndexOptions): Promise<EnqueuedTask>
 #### [Delete index](https://www.meilisearch.com/docs/reference/api/indexes#delete-an-index)
 
 ##### Using the client
+
 ```ts
 client.deleteIndex(uid): Promise<void>
 ```
 
 ##### Using the index object
+
 ```ts
 client.index('myIndex').delete(): Promise<void>
 ```
@@ -942,7 +936,6 @@ client.index('myIndex').updateTypoTolerance(typoTolerance: TypoTolerance | null)
 ```ts
 client.index('myIndex').resetTypoTolerance(): Promise<EnqueuedTask>
 ```
-
 
 ### Separator tokens <!-- omit in toc -->
 

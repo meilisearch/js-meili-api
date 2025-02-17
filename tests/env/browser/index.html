@@ -1,52 +1,50 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
 
-<head>
-  <meta charset='utf-8'>
-  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-  <title>Page Title</title>
-  <meta name='viewport' content='width=device-width, initial-scale=1'>
-</head>
-
-<body>
-</body>
-
+  <body></body>
 </html>
 <script src="../../../dist/bundles/meilisearch.umd.js"></script>
 <script>
   (async () => {
-
     try {
-      const UID = "testIndex"
+      const UID = "testIndex";
 
       const client = new meilisearch.MeiliSearch({
-        host: 'http://localhost:7700',
-        apiKey: 'masterKey',
-      })
-      const task = await client.createIndex(UID)
-      await client.waitForTask(task.taskUid)
+        host: "http://localhost:7700",
+        apiKey: "masterKey",
+      });
+      const task = await client.createIndex(UID);
+      await client.waitForTask(task.taskUid);
 
-      const documentTask = await client.index(UID).addDocuments([{ id: 1, title: "wonder woman" }])
-      await client.waitForTask(documentTask.taskUid)
+      const documentTask = await client
+        .index(UID)
+        .addDocuments([{ id: 1, title: "wonder woman" }]);
+      await client.waitForTask(documentTask.taskUid);
 
-      const index = await client.index(UID).getRawInfo()
+      const index = await client.index(UID).getRawInfo();
 
       // Create dynamic element to wait on with puppeteer
       const indexDiv = document.createElement("div");
       indexDiv.setAttribute("id", "indexes");
-      indexDiv.innerHTML = index.uid
+      indexDiv.innerHTML = index.uid;
       document.body.insertBefore(indexDiv, document.querySelector("#content"));
 
       const searchDiv = document.createElement("div");
       searchDiv.setAttribute("id", "search");
-      const search = await client.index(UID).search()
-      searchDiv.innerHTML = JSON.stringify(search)
+      const search = await client.index(UID).search();
+      searchDiv.innerHTML = JSON.stringify(search);
       document.body.insertBefore(searchDiv, document.querySelector("#content"));
 
-      const deleteTask = await client.index(UID).delete()
-      await client.waitForTask(deleteTask.uid)
+      const deleteTask = await client.index(UID).delete();
+      await client.waitForTask(deleteTask.uid);
     } catch (e) {
       console.error(e);
     }
-  })()
+  })();
 </script>

@@ -1,29 +1,28 @@
-const webpack = require('webpack')
-const path = require('node:path')
+const webpack = require("webpack");
+const path = require("node:path");
 
 let config = {
-  entry: './src/index.ts',
+  entry: "./src/index.ts",
   output: {
-    path: path.resolve(__dirname, './public'),
-    filename: './bundle.js',
+    path: path.resolve(__dirname, "./public"),
+    filename: "./bundle.js",
   },
-  mode: 'development',
+  mode: "development",
   module: {
     rules: [
       {
         test: /\.tsx?$/,
-        use: 'ts-loader',
+        use: "ts-loader",
         exclude: /node_modules/,
       },
     ],
   },
   devServer: {
-    static: './public',
+    static: "./public",
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
-
+    extensions: [".tsx", ".ts", ".js"],
   },
-}
+};
 
-module.exports = config
+module.exports = config;

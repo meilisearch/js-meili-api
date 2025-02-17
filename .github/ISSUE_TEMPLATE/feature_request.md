@@ -1,9 +1,9 @@
 ---
 name: Feature Request & Enhancement 💡
 about: Suggest a new idea for the project.
-title: ''
-labels: ''
-assignees: ''
+title: ""
+labels: ""
+assignees: ""
 ---
 
 <!-- This is not an exhaustive model but a help. No step is mandatory. -->

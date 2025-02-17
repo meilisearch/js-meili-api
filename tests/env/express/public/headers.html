@@ -1,49 +1,48 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
 
-<head>
-  <meta charset='utf-8'>
-  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-  <title>Page Title</title>
-  <meta name='viewport' content='width=device-width, initial-scale=1'>
-</head>
-
-<body>
-  <div id="content"></div>
-</body>
-
+  <body>
+    <div id="content"></div>
+  </body>
 </html>
 <script src="./index.min.js"></script>
 <script>
-  ; (async () => {
-    const client = new meilisearch.MeiliSearch({ host: "http://localhost:7700", apiKey: "masterKey" })
-    const UID = "headers"
+  (async () => {
+    const client = new meilisearch.MeiliSearch({
+      host: "http://localhost:7700",
+      apiKey: "masterKey",
+    });
+    const UID = "headers";
     const errorDiv = document.createElement("div");
     errorDiv.setAttribute("id", "error");
 
-    let error = 'NO ERRORS'
+    let error = "NO ERRORS";
     try {
-      const task = await client.createIndex(UID)
-      await client.waitForTask(task.taskUid)
+      const task = await client.createIndex(UID);
+      await client.waitForTask(task.taskUid);
       await fetch(`http://localhost:7700/indexes/${UID}/documents`, {
-        method: 'POST',
+        method: "POST",
         headers: {
           Authorization: `Bearer masterKey`,
-          'User-Agent': 'plif plouf',
-          "wrong-header": "wrong header"
+          "User-Agent": "plif plouf",
+          "wrong-header": "wrong header",
         },
-        body: []
-      })
+        body: [],
+      });
     } catch (e) {
-      error = e.message
+      error = e.message;
     }
 
-    errorDiv.innerHTML = error
+    errorDiv.innerHTML = error;
     document.body.insertBefore(errorDiv, document.querySelector("#content"));
 
-    const deleteTask = await client.index(UID).delete()
-    await client.waitForTask(deleteTask.taskUid)
-  })()
-
-
+    const deleteTask = await client.index(UID).delete();
+    await client.waitForTask(deleteTask.taskUid);
+  })();
 </script>
