@@ -7,8 +7,6 @@ import {
   MeiliSearch,
   getClient,
   dataset,
-  getKey,
-  HOST,
 } from "./utils/meilisearch-test-utils.js";
 
 const index = {
@@ -151,16 +149,6 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: Update embedders settings `, async () => {
       const client = await getClient(permission);
-      const key = await getKey(permission);
-
-      await fetch(`${HOST}/experimental-features`, {
-        body: JSON.stringify({ vectorStore: true }),
-        headers: {
-          Authorization: `Bearer ${key}`,
-          "Content-Type": "application/json",
-        },
-        method: "PATCH",
-      });
 
       const newSettings: Settings = {
         embedders: {
@@ -219,16 +207,6 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: Reset embedders settings `, async () => {
       const client = await getClient(permission);
-      const key = await getKey(permission);
-
-      await fetch(`${HOST}/experimental-features`, {
-        body: JSON.stringify({ vectorStore: true }),
-        headers: {
-          Authorization: `Bearer ${key}`,
-          "Content-Type": "application/json",
-        },
-        method: "PATCH",
-      });
 
       const newSettings: Settings = {
         embedders: null,

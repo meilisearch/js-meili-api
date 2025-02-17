@@ -7,6 +7,7 @@ exports[`Test on settings > Admin key: Get default settings of an index 1`] = `
     "*",
   ],
   "distinctAttribute": null,
+  "embedders": {},
   "facetSearch": true,
   "faceting": {
     "maxValuesPerFacet": 100,
@@ -57,6 +58,7 @@ exports[`Test on settings > Admin key: Get default settings of empty index with 
     "*",
   ],
   "distinctAttribute": null,
+  "embedders": {},
   "facetSearch": true,
   "faceting": {
     "maxValuesPerFacet": 100,
@@ -107,6 +109,7 @@ exports[`Test on settings > Admin key: Reset embedders settings  1`] = `
     "*",
   ],
   "distinctAttribute": null,
+  "embedders": {},
   "facetSearch": true,
   "faceting": {
     "maxValuesPerFacet": 100,
@@ -157,6 +160,7 @@ exports[`Test on settings > Admin key: Reset settings 1`] = `
     "*",
   ],
   "distinctAttribute": null,
+  "embedders": {},
   "facetSearch": true,
   "faceting": {
     "maxValuesPerFacet": 100,
@@ -207,6 +211,7 @@ exports[`Test on settings > Admin key: Reset settings of empty index 1`] = `
     "*",
   ],
   "distinctAttribute": null,
+  "embedders": {},
   "facetSearch": true,
   "faceting": {
     "maxValuesPerFacet": 100,
@@ -316,6 +321,7 @@ exports[`Test on settings > Admin key: Update facetSearch settings on empty inde
     "*",
   ],
   "distinctAttribute": null,
+  "embedders": {},
   "facetSearch": false,
   "faceting": {
     "maxValuesPerFacet": 100,
@@ -366,6 +372,7 @@ exports[`Test on settings > Admin key: Update prefixSearch settings on an empty 
     "*",
   ],
   "distinctAttribute": null,
+  "embedders": {},
   "facetSearch": true,
   "faceting": {
     "maxValuesPerFacet": 100,
@@ -416,6 +423,7 @@ exports[`Test on settings > Admin key: Update searchableAttributes settings on e
     "*",
   ],
   "distinctAttribute": null,
+  "embedders": {},
   "facetSearch": true,
   "faceting": {
     "maxValuesPerFacet": 100,
@@ -466,6 +474,7 @@ exports[`Test on settings > Admin key: Update searchableAttributes settings on e
     "*",
   ],
   "distinctAttribute": null,
+  "embedders": {},
   "facetSearch": true,
   "faceting": {
     "maxValuesPerFacet": 100,
@@ -519,6 +528,7 @@ exports[`Test on settings > Admin key: Update settings 1`] = `
     "title",
   ],
   "distinctAttribute": "title",
+  "embedders": {},
   "facetSearch": true,
   "faceting": {
     "maxValuesPerFacet": 50,
@@ -587,6 +597,7 @@ exports[`Test on settings > Admin key: Update settings on empty index with prima
     "*",
   ],
   "distinctAttribute": "title",
+  "embedders": {},
   "facetSearch": true,
   "faceting": {
     "maxValuesPerFacet": 100,
@@ -635,6 +646,7 @@ exports[`Test on settings > Admin key: Update settings with all null values 1`] 
     "*",
   ],
   "distinctAttribute": null,
+  "embedders": {},
   "facetSearch": true,
   "faceting": {
     "maxValuesPerFacet": 100,
@@ -685,6 +697,7 @@ exports[`Test on settings > Master key: Get default settings of an index 1`] = `
     "*",
   ],
   "distinctAttribute": null,
+  "embedders": {},
   "facetSearch": true,
   "faceting": {
     "maxValuesPerFacet": 100,
@@ -735,6 +748,7 @@ exports[`Test on settings > Master key: Get default settings of empty index with
     "*",
   ],
   "distinctAttribute": null,
+  "embedders": {},
   "facetSearch": true,
   "faceting": {
     "maxValuesPerFacet": 100,
@@ -785,6 +799,7 @@ exports[`Test on settings > Master key: Reset embedders settings  1`] = `
     "*",
   ],
   "distinctAttribute": null,
+  "embedders": {},
   "facetSearch": true,
   "faceting": {
     "maxValuesPerFacet": 100,
@@ -835,6 +850,7 @@ exports[`Test on settings > Master key: Reset settings 1`] = `
     "*",
   ],
   "distinctAttribute": null,
+  "embedders": {},
   "facetSearch": true,
   "faceting": {
     "maxValuesPerFacet": 100,
@@ -885,6 +901,7 @@ exports[`Test on settings > Master key: Reset settings of empty index 1`] = `
     "*",
   ],
   "distinctAttribute": null,
+  "embedders": {},
   "facetSearch": true,
   "faceting": {
     "maxValuesPerFacet": 100,
@@ -994,6 +1011,7 @@ exports[`Test on settings > Master key: Update facetSearch settings on empty ind
     "*",
   ],
   "distinctAttribute": null,
+  "embedders": {},
   "facetSearch": false,
   "faceting": {
     "maxValuesPerFacet": 100,
@@ -1044,6 +1062,7 @@ exports[`Test on settings > Master key: Update prefixSearch settings on an empty
     "*",
   ],
   "distinctAttribute": null,
+  "embedders": {},
   "facetSearch": true,
   "faceting": {
     "maxValuesPerFacet": 100,
@@ -1094,6 +1113,7 @@ exports[`Test on settings > Master key: Update searchableAttributes settings on 
     "*",
   ],
   "distinctAttribute": null,
+  "embedders": {},
   "facetSearch": true,
   "faceting": {
     "maxValuesPerFacet": 100,
@@ -1144,6 +1164,7 @@ exports[`Test on settings > Master key: Update searchableAttributes settings on 
     "*",
   ],
   "distinctAttribute": null,
+  "embedders": {},
   "facetSearch": true,
   "faceting": {
     "maxValuesPerFacet": 100,
@@ -1197,6 +1218,7 @@ exports[`Test on settings > Master key: Update settings 1`] = `
     "title",
   ],
   "distinctAttribute": "title",
+  "embedders": {},
   "facetSearch": true,
   "faceting": {
     "maxValuesPerFacet": 50,
@@ -1265,6 +1287,7 @@ exports[`Test on settings > Master key: Update settings on empty index with prim
     "*",
   ],
   "distinctAttribute": "title",
+  "embedders": {},
   "facetSearch": true,
   "faceting": {
     "maxValuesPerFacet": 100,
@@ -1313,6 +1336,7 @@ exports[`Test on settings > Master key: Update settings with all null values 1`]
     "*",
   ],
   "distinctAttribute": null,
+  "embedders": {},
   "facetSearch": true,
   "faceting": {
     "maxValuesPerFacet": 100,

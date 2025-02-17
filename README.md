@@ -1066,8 +1066,6 @@ client.index('myIndex').resetPrefixSearch(): Promise<EnqueuedTask>
 
 ### Embedders <!-- omit in toc -->
 
-⚠️ This feature is experimental. Activate the [`vectorStore` experimental feature to use it](https://www.meilisearch.com/docs/reference/api/experimental_features#configure-experimental-features)
-
 #### Get embedders
 
 ```ts

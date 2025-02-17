@@ -226,15 +226,6 @@ Hint: It might not be working because maybe you're not up to date with the Meili
         const client = await getClient(permission);
         const adminKey = await getKey("Admin");
 
-        await fetch(`${HOST}/experimental-features`, {
-          body: JSON.stringify({ vectorStore: true }),
-          headers: {
-            Authorization: `Bearer ${adminKey}`,
-            "Content-Type": "application/json",
-          },
-          method: "PATCH",
-        });
-
         const { taskUid } = await client
           .index(indexPk.uid)
           .addDocuments(dataset);
@@ -268,15 +259,6 @@ Hint: It might not be working because maybe you're not up to date with the Meili
       test(`${permission} key: Get documents without retrieveVectors`, async () => {
         const client = await getClient(permission);
         const adminKey = await getKey("Admin");
-
-        await fetch(`${HOST}/experimental-features`, {
-          body: JSON.stringify({ vectorStore: true }),
-          headers: {
-            Authorization: `Bearer ${adminKey}`,
-            "Content-Type": "application/json",
-          },
-          method: "PATCH",
-        });
 
         const { taskUid } = await client
           .index(indexPk.uid)
