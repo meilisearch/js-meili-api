@@ -65,6 +65,9 @@ typings/
 # Output of 'npm pack'
 *.tgz
 
+# JSR generated config
+jsr.json
+
 # Generated Docs
 docs/
 

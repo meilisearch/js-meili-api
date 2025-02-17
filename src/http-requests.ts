@@ -122,7 +122,7 @@ class HttpRequests {
     params?: { [key: string]: any };
     body?: any;
     config?: Record<string, any>;
-  }) {
+  }): Promise<any> {
     const constructURL = new URL(url, this.url);
     if (params) {
       const queryParams = new URLSearchParams();

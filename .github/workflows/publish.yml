@@ -1,4 +1,4 @@
-name: publish to npm
+name: publish to npm and jsr
 on:
   release:
     types: [published]
@@ -6,6 +6,9 @@ on:
 jobs:
   publish-npm:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # The OIDC ID token is used for authentication with JSR.
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -18,16 +21,16 @@ jobs:
       - name: Check tag format
         run: sh .github/scripts/check-tag-format.sh "${{ github.event.release.prerelease }}"
       - name: Install dependencies
-        run: yarn install
+        run: yarn
       - name: Build meilisearch-js
         run: yarn build
       - name: Publish with latest tag
         if: '!github.event.release.prerelease'
-        run: npm publish .
+        run: npm publish && yarn publish:jsr
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
       - name: Publish with beta tag
         if: 'github.event.release.prerelease'
-        run: npm publish . --tag beta
+        run: npm publish --tag beta
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

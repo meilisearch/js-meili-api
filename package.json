@@ -40,6 +40,7 @@
   },
   "scripts": {
     "playground:javascript": "vite serve playgrounds/javascript --open",
+    "publish:jsr": "node scripts/make-jsr-json.js && npx jsr publish",
     "build:docs": "typedoc",
     "build": "vite build && tsc -p tsconfig.build.json && vite --mode production-umd build",
     "postbuild": "node scripts/build.js",
