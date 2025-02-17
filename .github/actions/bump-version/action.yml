@@ -1,0 +1,42 @@
+name: "Bump version"
+inputs:
+  github-token:
+    description: GitHub token for authentication
+    required: true
+  version:
+    description: Optional version so action can skip checking separately
+runs:
+  using: "composite"
+  steps:
+    - name: Get release draft version and set environment variable
+      if: "${{ inputs.version == '' }}"
+      run: |
+        VERSION_DETAILS=gh release -R ${{ github.repository }} ls -L 1 --json isDraft,tagName
+        echo "PKG_VERSION=$VERSION_DETAILS" >> "$GITHUB_ENV"
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+    - name: Set environment variable to version
+      if: "${{ inputs.version != '' }}"
+      run: echo "PKG_VERSION=${{ inputs.version }}" >> "$GITHUB_ENV"
+    - name: Bump version of package
+      id: bump-version
+      run: |
+        PARSED_VERSION=node .\scripts\bump-version.js $PKG_VERSION
+        npm version $PARSED_VERSION --commit-hooks false --git-tag-version false
+        echo "PKG_VERSION=$PARSED_VERSION" >> "$GITHUB_OUTPUT"
+    - name: Create pull request with the changes
+      uses: peter-evans/create-pull-request@v7
+      with:
+        token: ${{ inputs.github-token }}
+        commit-message: Update files containing the version of the package
+        branch: bump-version
+        title: Update version for the next release (${{ steps.bump-version.outputs.PKG_VERSION }})
+        body: |
+          _This PR is auto-generated._
+
+          - updates package version to `"${{ steps.bump-version.outputs.PKG_VERSION }}"`
+
+          > [!IMPORTANT]
+          >
+          > Every time the main branch is updated and release drafter bumps the version of the new release draft, this PR is auto-updated!
+        labels: skip-changelog

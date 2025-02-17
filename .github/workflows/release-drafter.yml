@@ -8,9 +8,27 @@ on:
 jobs:
   update_release_draft:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
-      - uses: release-drafter/release-drafter@v6
+      - name: Draft release
+        id: draft-release
+        uses: release-drafter/release-drafter@v6
         with:
           config-name: release-draft-template.yml
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_DRAFTER_TOKEN }}
+      - name: Get status of version bump PR
+        id: pr-status
+        run: |
+          PR_NOT_OPEN=gh pr -R ${{ github.repository }} view bump-version --json closed --jq '.closed' || echo true
+          echo "PR_NOT_OPEN=$PR_NOT_OPEN" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        if: steps.pr-status.outputs.PR_NOT_OPEN == 'false'
+      - name: Update PR with version bump
+        if: steps.pr-status.outputs.PR_NOT_OPEN == 'false'
+        uses: ./.github/actions/bump-version
+        with:
+          version: ${{ steps.draft-release.outputs.resolved_version }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
