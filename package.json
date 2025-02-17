@@ -36,7 +36,7 @@
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/meilisearch/meilisearch-js"
+    "url": "https://github.com/meilisearch/meilisearch-js.git"
   },
   "scripts": {
     "playground:javascript": "vite serve playgrounds/javascript --open",
