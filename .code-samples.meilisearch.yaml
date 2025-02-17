@@ -821,3 +821,13 @@ get_all_batches_1: |-
   client.getBatches();
 get_batch_1: |-
   client.getBatch(BATCH_UID);
+# Vector search
+update_embedders_1: |-
+  client.index('INDEX_NAME').updateEmbedders({
+    default: {
+      source: 'openAi',
+      apiKey: 'OPEN_AI_API_KEY',
+      model: 'text-embedding-3-small',
+      documentTemplate: 'A document titled '{{doc.title}}' whose description starts with {{doc.overview|truncatewords: 20}}'
+    }
+  });
