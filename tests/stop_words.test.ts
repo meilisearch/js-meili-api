@@ -1,5 +1,5 @@
 import { afterAll, beforeEach, describe, expect, test } from "vitest";
-import { ErrorStatusCode } from "../src/types.js";
+import { ErrorStatusCode } from "../src/types/index.js";
 import { EnqueuedTask } from "../src/enqueued-task.js";
 import {
   clearAllIndexes,
@@ -29,7 +29,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: Get default stop words`, async () => {
       const client = await getClient(permission);
-      const response: string[] = await client.index(index.uid).getStopWords();
+      const response = await client.index(index.uid).getStopWords();
 
       expect(response).toEqual([]);
     });
@@ -42,7 +42,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
         .updateStopWords(newStopWords);
       await client.index(index.uid).waitForTask(task.taskUid);
 
-      const response: string[] = await client.index(index.uid).getStopWords();
+      const response = await client.index(index.uid).getStopWords();
 
       expect(response).toEqual(newStopWords);
     });
@@ -55,7 +55,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
         .updateStopWords(newStopWords);
       await client.index(index.uid).waitForTask(task.taskUid);
 
-      const response: string[] = await client.index(index.uid).getStopWords();
+      const response = await client.index(index.uid).getStopWords();
 
       expect(response).toEqual([]);
     });
@@ -65,7 +65,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
       const task: EnqueuedTask = await client.index(index.uid).resetStopWords();
       await client.index(index.uid).waitForTask(task.taskUid);
 
-      const response: string[] = await client.index(index.uid).getStopWords();
+      const response = await client.index(index.uid).getStopWords();
 
       expect(response).toEqual([]);
     });

@@ -6,7 +6,7 @@ import {
   expect,
   test,
 } from "vitest";
-import { ErrorStatusCode } from "../src/types.js";
+import { ErrorStatusCode } from "../src/types/index.js";
 import {
   clearAllIndexes,
   config,
@@ -36,9 +36,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     test(`${permission} key: Get default searchable attributes`, async () => {
       const client = await getClient(permission);
 
-      const response: string[] = await client
-        .index(index.uid)
-        .getSearchableAttributes();
+      const response = await client.index(index.uid).getSearchableAttributes();
 
       expect(response).toEqual(["*"]);
     });
@@ -51,9 +49,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
         .updateSearchableAttributes(newSearchableAttributes);
       await client.index(index.uid).waitForTask(task.taskUid);
 
-      const response: string[] = await client
-        .index(index.uid)
-        .getSearchableAttributes();
+      const response = await client.index(index.uid).getSearchableAttributes();
 
       expect(response).toEqual(newSearchableAttributes);
     });
@@ -65,9 +61,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
         .updateSearchableAttributes(null);
       await client.index(index.uid).waitForTask(task.taskUid);
 
-      const response: string[] = await client
-        .index(index.uid)
-        .getSearchableAttributes();
+      const response = await client.index(index.uid).getSearchableAttributes();
 
       expect(response).toEqual(["*"]);
     });
@@ -77,9 +71,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
       const task = await client.index(index.uid).resetSearchableAttributes();
       await client.index(index.uid).waitForTask(task.taskUid);
 
-      const response: string[] = await client
-        .index(index.uid)
-        .getSearchableAttributes();
+      const response = await client.index(index.uid).getSearchableAttributes();
 
       expect(response).toEqual(["*"]);
     });

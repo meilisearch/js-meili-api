@@ -1,5 +1,5 @@
 import { afterAll, beforeEach, describe, expect, test } from "vitest";
-import { ErrorStatusCode } from "../src/types.js";
+import { ErrorStatusCode } from "../src/types/index.js";
 import {
   clearAllIndexes,
   config,
@@ -28,7 +28,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: Get default synonyms`, async () => {
       const client = await getClient(permission);
-      const response: object = await client.index(index.uid).getSynonyms();
+      const response = await client.index(index.uid).getSynonyms();
 
       expect(response).toEqual({});
     });
@@ -41,7 +41,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
       const task = await client.index(index.uid).updateSynonyms(newSynonyms);
       await client.waitForTask(task.taskUid);
 
-      const response: object = await client.index(index.uid).getSynonyms();
+      const response = await client.index(index.uid).getSynonyms();
 
       expect(response).toEqual(newSynonyms);
     });
@@ -52,7 +52,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
       const task = await client.index(index.uid).updateSynonyms(newSynonyms);
       await client.waitForTask(task.taskUid);
 
-      const response: object = await client.index(index.uid).getSynonyms();
+      const response = await client.index(index.uid).getSynonyms();
 
       expect(response).toEqual({});
     });
@@ -62,7 +62,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
       const task = await client.index(index.uid).resetSynonyms();
       await client.waitForTask(task.taskUid);
 
-      const response: object = await client.index(index.uid).getSynonyms();
+      const response = await client.index(index.uid).getSynonyms();
 
       expect(response).toEqual({});
     });

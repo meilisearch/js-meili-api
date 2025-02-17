@@ -1,5 +1,5 @@
 import { expect, test, describe, beforeEach, afterAll } from "vitest";
-import { ErrorStatusCode } from "../src/types.js";
+import { ErrorStatusCode } from "../src/types/index.js";
 import { EnqueuedTask } from "../src/enqueued-task.js";
 import {
   clearAllIndexes,
@@ -39,9 +39,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: Get default ranking rules`, async () => {
       const client = await getClient(permission);
-      const response: string[] = await client
-        .index(index.uid)
-        .getRankingRules();
+      const response = await client.index(index.uid).getRankingRules();
       expect(response).toEqual(defaultRankingRules);
     });
 
@@ -53,9 +51,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
         .updateRankingRules(newRankingRules);
       await client.index(index.uid).waitForTask(task.taskUid);
 
-      const response: string[] = await client
-        .index(index.uid)
-        .getRankingRules();
+      const response = await client.index(index.uid).getRankingRules();
 
       expect(response).toEqual(newRankingRules);
     });
@@ -67,9 +63,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
         .updateRankingRules(null);
       await client.index(index.uid).waitForTask(task.taskUid);
 
-      const response: string[] = await client
-        .index(index.uid)
-        .getRankingRules();
+      const response = await client.index(index.uid).getRankingRules();
 
       expect(response).toEqual(defaultRankingRules);
     });
@@ -81,9 +75,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
         .resetRankingRules();
       await client.index(index.uid).waitForTask(task.taskUid);
 
-      const response: string[] = await client
-        .index(index.uid)
-        .getRankingRules();
+      const response = await client.index(index.uid).getRankingRules();
 
       expect(response).toEqual(defaultRankingRules);
     });

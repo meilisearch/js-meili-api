@@ -4,7 +4,7 @@ import {
   config,
   getClient,
 } from "./utils/meilisearch-test-utils.js";
-import { TaskStatus, ContentTypeEnum } from "../src/types.js";
+import { TaskStatus, ContentTypeEnum } from "../src/types/index.js";
 
 beforeEach(async () => {
   await clearAllIndexes(config);

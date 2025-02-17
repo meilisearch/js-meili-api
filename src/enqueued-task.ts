@@ -1,4 +1,4 @@
-import type { EnqueuedTaskObject } from "./types.js";
+import type { EnqueuedTaskObject } from "./types/index.js";
 
 class EnqueuedTask {
   taskUid: EnqueuedTaskObject["taskUid"];

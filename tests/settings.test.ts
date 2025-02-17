@@ -1,5 +1,5 @@
 import { afterAll, beforeEach, describe, expect, test } from "vitest";
-import { ErrorStatusCode, type Settings } from "../src/types.js";
+import { ErrorStatusCode, type UpdatableSettings } from "../src/types/index.js";
 import {
   clearAllIndexes,
   config,
@@ -58,7 +58,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: Update settings`, async () => {
       const client = await getClient(permission);
-      const newSettings: Settings = {
+      const newSettings: UpdatableSettings = {
         filterableAttributes: ["title"],
         sortableAttributes: ["title"],
         distinctAttribute: "title",
@@ -106,7 +106,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: Update settings with all null values`, async () => {
       const client = await getClient(permission);
-      const newSettings: Settings = {
+      const newSettings: UpdatableSettings = {
         filterableAttributes: null,
         sortableAttributes: null,
         distinctAttribute: null,
@@ -150,7 +150,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     test(`${permission} key: Update embedders settings `, async () => {
       const client = await getClient(permission);
 
-      const newSettings: Settings = {
+      const newSettings: UpdatableSettings = {
         embedders: {
           default: {
             source: "huggingFace",
@@ -208,7 +208,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     test(`${permission} key: Reset embedders settings `, async () => {
       const client = await getClient(permission);
 
-      const newSettings: Settings = {
+      const newSettings: UpdatableSettings = {
         embedders: null,
       };
       const task = await client.index(index.uid).updateSettings(newSettings);

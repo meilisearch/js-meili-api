@@ -4,8 +4,9 @@
 // Definitions: https://github.com/meilisearch/meilisearch-js
 // TypeScript Version: ^3.8.3
 
-import { Task } from "./task.js";
-import { Batch } from "./batch.js";
+import { Task } from "../task.js";
+import { Batch } from "../batch.js";
+import type { Settings } from "./settings.js";
 
 export type Config = {
   host: string;
@@ -375,158 +376,6 @@ export type UpdateDocumentsByFunctionOptions = {
 };
 
 /*
- ** Settings
- */
-
-export type FilterableAttributes = string[] | null;
-export type DistinctAttribute = string | null;
-export type SearchableAttributes = string[] | null;
-export type SortableAttributes = string[] | null;
-export type DisplayedAttributes = string[] | null;
-export type RankingRules = string[] | null;
-export type StopWords = string[] | null;
-export type Synonyms = {
-  [field: string]: string[];
-} | null;
-export type TypoTolerance = {
-  enabled?: boolean | null;
-  disableOnAttributes?: string[] | null;
-  disableOnWords?: string[] | null;
-  minWordSizeForTypos?: {
-    oneTypo?: number | null;
-    twoTypos?: number | null;
-  };
-} | null;
-export type SeparatorTokens = string[] | null;
-export type NonSeparatorTokens = string[] | null;
-export type Dictionary = string[] | null;
-export type ProximityPrecision = "byWord" | "byAttribute";
-
-export type Distribution = {
-  mean: number;
-  sigma: number;
-};
-
-export type OpenAiEmbedder = {
-  source: "openAi";
-  model?: string;
-  apiKey?: string;
-  documentTemplate?: string;
-  dimensions?: number;
-  distribution?: Distribution;
-  url?: string;
-  documentTemplateMaxBytes?: number;
-  binaryQuantized?: boolean;
-};
-
-export type HuggingFaceEmbedder = {
-  source: "huggingFace";
-  model?: string;
-  revision?: string;
-  documentTemplate?: string;
-  distribution?: Distribution;
-  documentTemplateMaxBytes?: number;
-  binaryQuantized?: boolean;
-};
-
-export type UserProvidedEmbedder = {
-  source: "userProvided";
-  dimensions: number;
-  distribution?: Distribution;
-  binaryQuantized?: boolean;
-};
-
-export type RestEmbedder = {
-  source: "rest";
-  url: string;
-  apiKey?: string;
-  dimensions?: number;
-  documentTemplate?: string;
-  distribution?: Distribution;
-  request: Record<string, any>;
-  response: Record<string, any>;
-  headers?: Record<string, string>;
-  documentTemplateMaxBytes?: number;
-  binaryQuantized?: boolean;
-};
-
-export type OllamaEmbedder = {
-  source: "ollama";
-  url?: string;
-  apiKey?: string;
-  model?: string;
-  documentTemplate?: string;
-  distribution?: Distribution;
-  dimensions?: number;
-  documentTemplateMaxBytes?: number;
-  binaryQuantized?: boolean;
-};
-
-export type Embedder =
-  | OpenAiEmbedder
-  | HuggingFaceEmbedder
-  | UserProvidedEmbedder
-  | RestEmbedder
-  | OllamaEmbedder
-  | null;
-
-export type Embedders = Record<string, Embedder> | null;
-
-export type FacetOrder = "alpha" | "count";
-
-export type Faceting = {
-  maxValuesPerFacet?: number | null;
-  sortFacetValuesBy?: Record<string, FacetOrder> | null;
-};
-
-export type PaginationSettings = {
-  maxTotalHits?: number | null;
-};
-
-export type SearchCutoffMs = number | null;
-
-export type LocalizedAttribute = {
-  attributePatterns: string[];
-  locales: Locale[];
-};
-
-export type LocalizedAttributes = LocalizedAttribute[] | null;
-
-export type PrefixSearch = "indexingTime" | "disabled";
-
-export type Settings = {
-  filterableAttributes?: FilterableAttributes;
-  distinctAttribute?: DistinctAttribute;
-  sortableAttributes?: SortableAttributes;
-  searchableAttributes?: SearchableAttributes;
-  displayedAttributes?: DisplayedAttributes;
-  rankingRules?: RankingRules;
-  stopWords?: StopWords;
-  synonyms?: Synonyms;
-  typoTolerance?: TypoTolerance;
-  faceting?: Faceting;
-  pagination?: PaginationSettings;
-  separatorTokens?: SeparatorTokens;
-  nonSeparatorTokens?: NonSeparatorTokens;
-  dictionary?: Dictionary;
-  proximityPrecision?: ProximityPrecision;
-  embedders?: Embedders;
-  searchCutoffMs?: SearchCutoffMs;
-  localizedAttributes?: LocalizedAttributes;
-
-  /**
-   * Enable facet searching on all the filters of an index (requires Meilisearch
-   * 1.12.0 or later)
-   */
-  facetSearch?: boolean;
-  /**
-   * Enable the ability to search a word by prefix on an index (requires
-   * Meilisearch 1.12.0 or later)
-   */
-  prefixSearch?: "indexingTime" | "disabled";
-};
-
-/*
  ** TASKS
  */
 
@@ -590,70 +439,47 @@ export type EnqueuedTaskObject = {
   canceledBy: number;
 };
 
-export type TaskObject = Omit<EnqueuedTaskObject, "taskUid"> & {
-  uid: number;
-  /** The UID of the batch that the task belongs to (`null` for enqueued tasks) */
-  batchUid: number | null;
-  details: {
-    // Number of documents sent
-    receivedDocuments?: number;
+export type TaskObject = Settings &
+  Omit<EnqueuedTaskObject, "taskUid"> & {
+    uid: number;
+    /** The UID of the batch that the task belongs to (`null` for enqueued tasks) */
+    batchUid: number | null;
+    details: {
+      // Number of documents sent
+      receivedDocuments?: number;
 
-    // Number of documents successfully indexed/updated in Meilisearch
-    indexedDocuments?: number;
+      // Number of documents successfully indexed/updated in Meilisearch
+      indexedDocuments?: number;
 
-    // Number of deleted documents
-    deletedDocuments?: number;
+      // Number of deleted documents
+      deletedDocuments?: number;
 
-    // Number of documents found on a batch-delete
-    providedIds?: number;
+      // Number of documents found on a batch-delete
+      providedIds?: number;
 
-    // Primary key on index creation
-    primaryKey?: string;
+      // Primary key on index creation
+      primaryKey?: string;
 
-    // Ranking rules on settings actions
-    rankingRules?: RankingRules;
+      // Object containing the payload originating the `indexSwap` task creation
+      swaps?: SwapIndexesParams;
 
-    // Searchable attributes on settings actions
-    searchableAttributes?: SearchableAttributes;
+      // Number of tasks that matched the originalQuery filter
+      matchedTasks?: number;
 
-    // Displayed attributes on settings actions
-    displayedAttributes?: DisplayedAttributes;
+      // Number of tasks that were canceled
+      canceledTasks?: number;
 
-    // Filterable attributes on settings actions
-    filterableAttributes?: FilterableAttributes;
+      // Number of tasks that were deleted
+      deletedTasks?: number;
 
-    // Sortable attributes on settings actions
-    sortableAttributes?: SortableAttributes;
-
-    // Stop words on settings actions
-    stopWords?: StopWords;
-
-    // Stop words on settings actions
-    synonyms?: Synonyms;
-
-    // Distinct attribute on settings actions
-    distinctAttribute?: DistinctAttribute;
-
-    // Object containing the payload originating the `indexSwap` task creation
-    swaps?: SwapIndexesParams;
-
-    // Number of tasks that matched the originalQuery filter
-    matchedTasks?: number;
-
-    // Number of tasks that were canceled
-    canceledTasks?: number;
-
-    // Number of tasks that were deleted
-    deletedTasks?: number;
-
-    // Query parameters used to filter the tasks
-    originalFilter?: string;
+      // Query parameters used to filter the tasks
+      originalFilter?: string;
+    };
+    error: MeiliSearchErrorResponse | null;
+    duration: string;
+    startedAt: string;
+    finishedAt: string;
   };
-  error: MeiliSearchErrorResponse | null;
-  duration: string;
-  startedAt: string;
-  finishedAt: string;
-};
 
 export type SwapIndexesParams = Array<{
   indexes: string[];

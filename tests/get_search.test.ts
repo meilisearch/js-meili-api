@@ -1,5 +1,5 @@
 import { expect, test, describe, afterAll, beforeAll } from "vitest";
-import { ErrorStatusCode } from "../src/types.js";
+import { ErrorStatusCode } from "../src/types/index.js";
 import { EnqueuedTask } from "../src/enqueued-task.js";
 import {
   clearAllIndexes,

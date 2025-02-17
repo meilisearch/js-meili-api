@@ -28,9 +28,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: Get default proximity precision`, async () => {
       const client = await getClient(permission);
-      const response: string = await client
-        .index(index.uid)
-        .getProximityPrecision();
+      const response = await client.index(index.uid).getProximityPrecision();
 
       expect(response).toEqual("byWord");
     });
@@ -43,9 +41,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
         .updateProximityPrecision(newProximityPrecision);
       await client.index(index.uid).waitForTask(task.taskUid);
 
-      const response: string = await client
-        .index(index.uid)
-        .getProximityPrecision();
+      const response = await client.index(index.uid).getProximityPrecision();
 
       expect(response).toEqual(newProximityPrecision);
     });
@@ -58,9 +54,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
         .updateProximityPrecision(newProximityPrecision);
       await client.index(index.uid).waitForTask(task.taskUid);
 
-      const response: string = await client
-        .index(index.uid)
-        .getProximityPrecision();
+      const response = await client.index(index.uid).getProximityPrecision();
 
       expect(response).toEqual(newProximityPrecision);
     });
@@ -72,9 +66,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
         .resetProximityPrecision();
       await client.index(index.uid).waitForTask(task.taskUid);
 
-      const response: string = await client
-        .index(index.uid)
-        .getProximityPrecision();
+      const response = await client.index(index.uid).getProximityPrecision();
 
       expect(response).toEqual("byWord");
     });

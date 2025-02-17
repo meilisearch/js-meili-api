@@ -32,8 +32,8 @@ import type {
   BatchesResults,
   BatchesQuery,
   MultiSearchResponseOrSearchResponse,
-} from "./types.js";
-import { ErrorStatusCode } from "./types.js";
+} from "./types/index.js";
+import { ErrorStatusCode } from "./types/index.js";
 import { HttpRequests } from "./http-requests.js";
 import { TaskClient, type Task } from "./task.js";
 import { EnqueuedTask } from "./enqueued-task.js";

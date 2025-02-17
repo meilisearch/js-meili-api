@@ -1,5 +1,5 @@
 import { MeiliSearch, Index } from "../../src/index.js";
-import type { Config } from "../../src/types.js";
+import type { Config } from "../../src/types/index.js";
 
 // testing
 const MASTER_KEY = "masterKey";

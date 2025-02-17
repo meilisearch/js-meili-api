@@ -1,5 +1,5 @@
 import { expect, test, describe, beforeEach, afterAll } from "vitest";
-import { ErrorStatusCode } from "../src/types.js";
+import { ErrorStatusCode } from "../src/types/index.js";
 import {
   clearAllIndexes,
   config,
@@ -28,11 +28,9 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: Get default attributes for filtering`, async () => {
       const client = await getClient(permission);
-      const response: string[] = await client
-        .index(index.uid)
-        .getFilterableAttributes();
+      const response = await client.index(index.uid).getFilterableAttributes();
 
-      expect(response.sort()).toEqual([]);
+      expect(response?.sort()).toEqual([]);
     });
 
     test(`${permission} key: Update attributes for filtering`, async () => {
@@ -43,9 +41,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
         .updateFilterableAttributes(newFilterableAttributes);
       await client.index(index.uid).waitForTask(task.taskUid);
 
-      const response: string[] = await client
-        .index(index.uid)
-        .getFilterableAttributes();
+      const response = await client.index(index.uid).getFilterableAttributes();
       expect(response).toEqual(newFilterableAttributes);
     });
 
@@ -56,11 +52,9 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
         .updateFilterableAttributes(null);
       await client.index(index.uid).waitForTask(task.taskUid);
 
-      const response: string[] = await client
-        .index(index.uid)
-        .getFilterableAttributes();
+      const response = await client.index(index.uid).getFilterableAttributes();
 
-      expect(response.sort()).toEqual([]);
+      expect(response?.sort()).toEqual([]);
     });
 
     test(`${permission} key: Reset attributes for filtering`, async () => {
@@ -68,11 +62,9 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
       const task = await client.index(index.uid).resetFilterableAttributes();
       await client.index(index.uid).waitForTask(task.taskUid);
 
-      const response: string[] = await client
-        .index(index.uid)
-        .getFilterableAttributes();
+      const response = await client.index(index.uid).getFilterableAttributes();
 
-      expect(response.sort()).toEqual([]);
+      expect(response?.sort()).toEqual([]);
     });
   },
 );
