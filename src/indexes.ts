@@ -5,12 +5,7 @@
  * Copyright: 2019, MeiliSearch
  */
 
-import {
-  MeiliSearchError,
-  MeiliSearchRequestError,
-  versionErrorHintMessage,
-  MeiliSearchApiError,
-} from "./errors/index.js";
+import { MeiliSearchError } from "./errors/index.js";
 import type {
   Config,
   SearchResponse,
@@ -373,22 +368,13 @@ class Index<T extends Record<string, any> = Record<string, any>> {
 
     // In case `filter` is provided, use `POST /documents/fetch`
     if (parameters.filter !== undefined) {
-      try {
-        const url = `indexes/${this.uid}/documents/fetch`;
+      const url = `indexes/${this.uid}/documents/fetch`;
 
-        return await this.httpRequest.post<
-          DocumentsQuery,
-          Promise<ResourceResults<D[]>>
-        >(url, parameters);
-      } catch (e) {
-        if (e instanceof MeiliSearchRequestError) {
-          e.message = versionErrorHintMessage(e.message, "getDocuments");
-        } else if (e instanceof MeiliSearchApiError) {
-          e.message = versionErrorHintMessage(e.message, "getDocuments");
-        }
+      return await this.httpRequest.post<
+        DocumentsQuery,
+        Promise<ResourceResults<D[]>>
+      >(url, parameters);
 
-        throw e;
-      }
       // Else use `GET /documents` method
     } else {
       const url = `indexes/${this.uid}/documents`;
@@ -601,19 +587,9 @@ class Index<T extends Record<string, any> = Record<string, any>> {
       : "documents/delete-batch";
     const url = `indexes/${this.uid}/${endpoint}`;
 
-    try {
-      const task = await this.httpRequest.post(url, params);
+    const task = await this.httpRequest.post(url, params);
 
-      return new EnqueuedTask(task);
-    } catch (e) {
-      if (e instanceof MeiliSearchRequestError && isDocumentsDeletionQuery) {
-        e.message = versionErrorHintMessage(e.message, "deleteDocuments");
-      } else if (e instanceof MeiliSearchApiError) {
-        e.message = versionErrorHintMessage(e.message, "deleteDocuments");
-      }
-
-      throw e;
-    }
+    return new EnqueuedTask(task);
   }
 
   /**
