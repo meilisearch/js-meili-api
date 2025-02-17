@@ -6,7 +6,7 @@ Build the base project `/meilisearch-js` as this example uses the locally build 
 
 ```
 cd meilisearch-js
-yarn build
+pnpm build
 ```
 
 ## Credentials

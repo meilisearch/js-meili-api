@@ -8,16 +8,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install dependencies
-        run: yarn install
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/set-up-node
 
       - name: Generate Documentation
-        run: yarn build:docs
+        run: pnpm build:docs
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4

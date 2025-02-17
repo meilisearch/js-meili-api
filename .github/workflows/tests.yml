@@ -27,36 +27,33 @@ jobs:
       meilisearch:
         image: getmeili/meilisearch:latest
         env:
-          MEILI_MASTER_KEY: 'masterKey'
-          MEILI_NO_ANALYTICS: 'true'
+          MEILI_MASTER_KEY: "masterKey"
+          MEILI_NO_ANALYTICS: "true"
         ports:
-          - '7700:7700'
+          - "7700:7700"
     strategy:
       fail-fast: false
       matrix:
-        node: ['18', '20', '22']
-    name: integration-tests (Node.js ${{ matrix.node }})
+        node-version: ["18", "20", "22"]
+    name: integration-tests (Node.js ${{ matrix.node-version }})
     steps:
       - uses: actions/checkout@v4
-      - name: Setup node
-        uses: actions/setup-node@v4
+      - uses: ./.github/actions/set-up-node
         with:
-          node-version: ${{ matrix.node }}
-          cache: 'yarn'
-      - name: Install dependencies
-        run: yarn --dev
+          node-version: ${{ matrix.node-version }}
+
       - name: Run tests
-        run: yarn test
+        run: pnpm test
       - name: Build project
-        run: yarn build
+        run: pnpm build
       - name: Run ESM env
-        run: yarn test:env:esm
+        run: pnpm test:env:esm
       - name: Run Node.js env
-        run: yarn test:env:nodejs
+        run: pnpm test:env:nodejs
       - name: Run node typescript env
-        run: yarn test:env:node-ts
+        run: pnpm test:env:node-ts
       - name: Run Browser env
-        run: yarn test:env:browser
+        run: pnpm test:env:browser
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
         env:
@@ -66,15 +63,10 @@ jobs:
     name: style-check
     steps:
       - uses: actions/checkout@v4
-      - name: Setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: 'yarn'
-      - name: Install dependencies
-        run: yarn --dev
+      - uses: ./.github/actions/set-up-node
+
       - name: Run code style check
-        run: yarn style
+        run: pnpm style
       - name: Run yaml style check
         uses: ibiqlik/action-yamllint@v3
         with:
@@ -84,14 +76,9 @@ jobs:
     name: types-check
     steps:
       - uses: actions/checkout@v4
-      - name: Setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: 'yarn'
-      - name: Install dependencies
-        run: yarn --dev
+      - uses: ./.github/actions/set-up-node
+
       - name: Build project
-        run: yarn build
+        run: pnpm build
       - name: Run types check
-        run: yarn types
+        run: pnpm types

@@ -45,22 +45,22 @@
     "postbuild": "node scripts/build.js",
     "test": "vitest run --coverage",
     "types": "tsc -p tsconfig.json --noEmit",
-    "types:watch": "yarn types --watch",
-    "test:env:browser": "yarn build && node scripts/copy-umd-file.js --to ./tests/env/express/public && yarn --cwd tests/env/express && yarn --cwd tests/env/express test",
+    "types:watch": "pnpm types --watch",
+    "test:env:browser": "pnpm build && node scripts/copy-umd-file.js --to ./tests/env/express/public && pnpm -C tests/env/express install && pnpm -C tests/env/express test",
     "test:watch": "vitest watch",
-    "test:coverage": "yarn test",
-    "test:ci": "yarn test",
-    "test:env": "yarn build && yarn test:env:nodejs && yarn test:env:esm && yarn test:env:node-ts",
-    "test:env:node-ts": "yarn --cwd tests/env/typescript-node start",
-    "test:env:nodejs": "yarn build && node tests/env/node/index.cjs && node tests/env/node/getting_started.cjs",
-    "test:env:esm": "yarn --cwd tests/env/esm && yarn --cwd tests/env/esm start",
-    "test:env:nitro-app": "yarn build && yarn --cwd tests/env/nitro-app test",
+    "test:coverage": "pnpm test",
+    "test:ci": "pnpm test",
+    "test:env": "pnpm build && pnpm test:env:nodejs && pnpm test:env:esm && pnpm test:env:node-ts",
+    "test:env:node-ts": "pnpm -C tests/env/typescript-node start",
+    "test:env:nodejs": "pnpm build && node tests/env/node/index.cjs && node tests/env/node/getting_started.cjs",
+    "test:env:esm": "pnpm -C tests/env/esm install && pnpm -C tests/env/esm start",
+    "test:env:nitro-app": "pnpm build && pnpm -C tests/env/nitro-app test",
     "fmt": "prettier -c ./**/*.{js,ts}",
     "fmt:fix": "prettier -w ./**/*.{js,ts}",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
-    "style": "yarn fmt && yarn lint",
-    "style:fix": "yarn fmt:fix && yarn lint:fix"
+    "style": "pnpm fmt && pnpm lint",
+    "style:fix": "pnpm fmt:fix && pnpm lint:fix"
   },
   "files": [
     "src",
@@ -73,29 +73,29 @@
       "git add"
     ],
     "src/**/*.{ts,tsx}": [
-      "yarn lint:fix",
+      "pnpm lint:fix",
       "git add"
     ]
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
     "@types/eslint__js": "^8.42.3",
-    "@vitest/coverage-v8": "2.0.5",
     "@types/node": "^22.13.0",
-    "eslint": "^9.19.0",
-    "eslint-plugin-tsdoc": "^0.4.0",
-    "@vitest/eslint-plugin": "^1.1.25",
-    "eslint-config-prettier": "^10.0.1",
-    "typescript": "^5.7.3",
-    "vite": "^6.0.9",
     "@typescript-eslint/utils": "^8.22.0",
+    "@vitest/coverage-v8": "2.0.5",
+    "@vitest/eslint-plugin": "^1.1.25",
+    "eslint": "^9.19.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-tsdoc": "^0.4.0",
     "globals": "^15.14.0",
     "lint-staged": "15.4.3",
     "prettier": "^3.4.2",
     "prettier-plugin-jsdoc": "^1.3.2",
     "typedoc": "^0.27.6",
+    "typescript": "^5.7.3",
     "typescript-eslint": "^8.22.0",
+    "vite": "^6.0.9",
     "vitest": "2.0.5"
   },
-  "packageManager": "yarn@1.22.22"
+  "packageManager": "pnpm@9.15.4"
 }

@@ -5,7 +5,7 @@
   "main": "bundle/index.js",
   "scripts": {
     "build": "webpack",
-    "start": "yarn build && node dist/esm-meilisearch-js-test.js"
+    "start": "pnpm build && node dist/esm-meilisearch-js-test.js"
   },
   "author": "",
   "license": "ISC",

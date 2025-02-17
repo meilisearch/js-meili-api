@@ -5,12 +5,12 @@ name: Pre-Release Tests
 on:
   pull_request:
     branches:
-      - 'bump-meilisearch-v**'
-      - 'pre-release-beta/**'
+      - "bump-meilisearch-v**"
+      - "pre-release-beta/**"
   push:
     branches:
-      - 'bump-meilisearch-v**'
-      - 'pre-release-beta/**'
+      - "bump-meilisearch-v**"
+      - "pre-release-beta/**"
 
 jobs:
   meilisearch-version:
@@ -28,37 +28,34 @@ jobs:
   integration_tests:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || startsWith(github.base_ref, 'bump-meilisearch-v') || startsWith(github.base_ref, 'pre-release-beta')
-    needs: ['meilisearch-version']
+    needs: ["meilisearch-version"]
     services:
       meilisearch:
         image: getmeili/meilisearch:${{ needs.meilisearch-version.outputs.version }}
         env:
-          MEILI_MASTER_KEY: 'masterKey'
-          MEILI_NO_ANALYTICS: 'true'
+          MEILI_MASTER_KEY: "masterKey"
+          MEILI_NO_ANALYTICS: "true"
         ports:
-          - '7700:7700'
+          - "7700:7700"
     strategy:
       matrix:
-        node: ['18', '20', '22']
-    name: integration-tests (Node.js ${{ matrix.node }})
+        node-version: ["18", "20", "22"]
+    name: integration-tests (Node.js ${{ matrix.node-version }})
     steps:
       - uses: actions/checkout@v4
-      - name: Setup node
-        uses: actions/setup-node@v4
+      - uses: ./.github/actions/set-up-node
         with:
-          node-version: ${{ matrix.node }}
-          cache: yarn
-      - name: Install dependencies
-        run: yarn --dev
+          node-version: ${{ matrix.node-version }}
+
       - name: Run tests
-        run: yarn test
+        run: pnpm test
       - name: Build project
-        run: yarn build
+        run: pnpm build
       - name: Run ESM env
-        run: yarn test:env:esm
+        run: pnpm test:env:esm
       - name: Run Node.js env
-        run: yarn test:env:nodejs
+        run: pnpm test:env:nodejs
       - name: Run node typescript env
-        run: yarn test:env:node-ts
+        run: pnpm test:env:node-ts
       - name: Run Browser env
-        run: yarn test:env:browser
+        run: pnpm test:env:browser
