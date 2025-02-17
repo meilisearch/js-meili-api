@@ -55,11 +55,11 @@ export default defineConfig(({ mode }) => {
           },
     },
     test: {
-      include: "tests/**/*.test.ts",
-      exclude: "tests/env/**",
+      include: ["tests/**/*.test.ts"],
+      exclude: ["tests/env/**"],
       fileParallelism: false,
       testTimeout: 100_000, // 100 seconds
-      coverage: { include: "src/**/*.ts" },
+      coverage: { include: ["src/**/*.ts"] },
     },
   };
 });

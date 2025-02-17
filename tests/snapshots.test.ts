@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, test } from "vitest";
-import { ErrorStatusCode, TaskStatus } from "../src/types.js";
+import { beforeEach, describe, expect, test, assert } from "vitest";
+import { ErrorStatusCode } from "../src/types/index.js";
 import {
   clearAllIndexes,
   config,
@@ -17,11 +17,9 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
   ({ permission }) => {
     test(`${permission} key: create a new snapshot`, async () => {
       const client = await getClient(permission);
-      const { taskUid } = await client.createSnapshot();
+      const taskResult = await client.createSnapshot().waitTask();
 
-      const taskResult = await client.waitForTask(taskUid);
-
-      expect(taskResult).toHaveProperty("status", TaskStatus.TASK_SUCCEEDED);
+      assert.strictEqual(taskResult.status, "succeeded");
     });
   },
 );

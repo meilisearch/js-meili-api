@@ -6,7 +6,7 @@ import {
   expect,
   test,
 } from "vitest";
-import { ErrorStatusCode } from "../src/types.js";
+import { ErrorStatusCode } from "../src/types/index.js";
 import {
   clearAllIndexes,
   config,
@@ -29,13 +29,9 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
   ({ permission }) => {
     beforeEach(async () => {
       const client = await getClient("Master");
-      const { taskUid } = await client.createIndex(index.uid);
-      await client.waitForTask(taskUid);
+      await client.createIndex(index.uid).waitTask();
 
-      const { taskUid: docTask } = await client
-        .index(index.uid)
-        .addDocuments(dataset);
-      await client.waitForTask(docTask);
+      await client.index(index.uid).addDocuments(dataset).waitTask();
     });
 
     test(`${permission} key: Get default sortable attributes`, async () => {
@@ -49,10 +45,10 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     test(`${permission} key: Update sortable attributes`, async () => {
       const client = await getClient(permission);
       const newSortableAttributes = ["title"];
-      const task = await client
+      await client
         .index(index.uid)
-        .updateSortableAttributes(newSortableAttributes);
-      await client.index(index.uid).waitForTask(task.taskUid);
+        .updateSortableAttributes(newSortableAttributes)
+        .waitTask();
 
       const response = await client.index(index.uid).getSortableAttributes();
       expect(response).toEqual(newSortableAttributes);
@@ -60,8 +56,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: Update sortable attributes at null`, async () => {
       const client = await getClient(permission);
-      const task = await client.index(index.uid).updateSortableAttributes(null);
-      await client.index(index.uid).waitForTask(task.taskUid);
+      await client.index(index.uid).updateSortableAttributes(null).waitTask();
 
       const response = await client.index(index.uid).getSortableAttributes();
 
@@ -70,8 +65,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: Reset sortable attributes`, async () => {
       const client = await getClient(permission);
-      const task = await client.index(index.uid).resetSortableAttributes();
-      await client.index(index.uid).waitForTask(task.taskUid);
+      await client.index(index.uid).resetSortableAttributes().waitTask();
 
       const response = await client.index(index.uid).getSortableAttributes();
 
@@ -85,8 +79,7 @@ describe.each([{ permission: "Search" }])(
   ({ permission }) => {
     beforeEach(async () => {
       const client = await getClient("Master");
-      const { taskUid } = await client.createIndex(index.uid);
-      await client.waitForTask(taskUid);
+      await client.createIndex(index.uid).waitTask();
     });
 
     test(`${permission} key: try to get sortable attributes and be denied`, async () => {
@@ -117,8 +110,7 @@ describe.each([{ permission: "No" }])(
   ({ permission }) => {
     beforeAll(async () => {
       const client = await getClient("Master");
-      const { taskUid } = await client.createIndex(index.uid);
-      await client.waitForTask(taskUid);
+      await client.createIndex(index.uid).waitTask();
     });
 
     test(`${permission} key: try to get sortable attributes and be denied`, async () => {

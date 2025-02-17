@@ -1,5 +1,5 @@
 import { afterAll, expect, test, describe, beforeEach } from "vitest";
-import { ErrorStatusCode } from "../src/types.js";
+import { ErrorStatusCode } from "../src/types/index.js";
 import {
   clearAllIndexes,
   config,
@@ -23,8 +23,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     beforeEach(async () => {
       await clearAllIndexes(config);
       const client = await getClient("Master");
-      const { taskUid } = await client.index(index.uid).addDocuments(dataset);
-      await client.waitForTask(taskUid);
+      await client.index(index.uid).addDocuments(dataset).waitTask();
     });
 
     test(`${permission} key: Get facetSearch settings on empty index`, async () => {
@@ -37,10 +36,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     test(`${permission} key: Set facetSearch settings with dedicated endpoint on empty index`, async () => {
       const client = await getClient(permission);
 
-      const { taskUid } = await client
-        .index(index.uid)
-        .updateFacetSearch(false);
-      await client.index(index.uid).waitForTask(taskUid);
+      await client.index(index.uid).updateFacetSearch(false).waitTask();
 
       const updatedSettings = await client.index(index.uid).getFacetSearch();
       expect(updatedSettings).toBe(false);
@@ -49,8 +45,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     test(`${permission} key: Reset facetSearch settings on an empty index`, async () => {
       const client = await getClient(permission);
 
-      const { taskUid } = await client.index(index.uid).resetFacetSearch();
-      await client.index(index.uid).waitForTask(taskUid);
+      await client.index(index.uid).resetFacetSearch().waitTask();
 
       const response = await client.index(index.uid).getFacetSearch();
       expect(response).toMatchSnapshot();
@@ -64,8 +59,7 @@ describe.each([{ permission: "Search" }])(
     beforeEach(async () => {
       await clearAllIndexes(config);
       const client = await getClient("Master");
-      const { taskUid } = await client.createIndex(index.uid);
-      await client.waitForTask(taskUid);
+      await client.createIndex(index.uid).waitTask();
     });
 
     test(`${permission} key: try to get facet search settings and be denied`, async () => {
@@ -97,8 +91,7 @@ describe.each([{ permission: "No" }])(
     beforeEach(async () => {
       await clearAllIndexes(config);
       const client = await getClient("Master");
-      const { taskUid } = await client.createIndex(index.uid);
-      await client.waitForTask(taskUid);
+      await client.createIndex(index.uid).waitTask();
     });
 
     test(`${permission} key: try to get facet search settings and be denied`, async () => {

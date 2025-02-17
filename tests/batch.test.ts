@@ -18,21 +18,20 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
   ({ permission }) => {
     beforeEach(async () => {
       const client = await getClient("Master");
-      const { taskUid } = await client.createIndex(index.uid);
-      await client.waitForTask(taskUid);
+      await client.createIndex(index.uid).waitTask();
     });
 
     test(`${permission} key: Get all batches`, async () => {
       const client = await getClient(permission);
-      const batches = await client.getBatches();
+      const batches = await client.batches.getBatches();
       expect(batches.results.length).toBeGreaterThan(0);
     });
 
     test(`${permission} key: Get one batch`, async () => {
       const client = await getClient(permission);
 
-      const batches = await client.getBatches();
-      const batch = await client.getBatch(batches.results[0].uid);
+      const batches = await client.batches.getBatches();
+      const batch = await client.batches.getBatch(batches.results[0].uid);
       expect(batch.uid).toEqual(batches.results[0].uid);
       expect(batch.details).toBeDefined();
       expect(batch.stats).toHaveProperty("totalNbTasks");

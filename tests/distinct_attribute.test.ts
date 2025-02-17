@@ -1,5 +1,5 @@
 import { afterAll, expect, test, describe, beforeEach } from "vitest";
-import { ErrorStatusCode } from "../src/types.js";
+import { ErrorStatusCode } from "../src/types/index.js";
 import {
   clearAllIndexes,
   config,
@@ -24,8 +24,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
       await clearAllIndexes(config);
       const client = await getClient("master");
 
-      const { taskUid } = await client.index(index.uid).addDocuments(dataset);
-      await client.waitForTask(taskUid);
+      await client.index(index.uid).addDocuments(dataset).waitTask();
     });
 
     test(`${permission} key: Get default distinct attribute`, async () => {
@@ -37,20 +36,19 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     test(`${permission} key: Update distinct attribute`, async () => {
       const client = await getClient(permission);
       const newDistinctAttribute = "title";
-      const task = await client
+      await client
         .index(index.uid)
-        .updateDistinctAttribute(newDistinctAttribute);
-      await client.index(index.uid).waitForTask(task.taskUid);
+        .updateDistinctAttribute(newDistinctAttribute)
+        .waitTask();
 
       const response = await client.index(index.uid).getDistinctAttribute();
 
       expect(response).toEqual(newDistinctAttribute);
     });
 
-    test(`${permission} key: Update distinct attribute at null`, async () => {
+    test(`${permission} key: Update distinct attribute at undefined`, async () => {
       const client = await getClient(permission);
-      const task = await client.index(index.uid).updateDistinctAttribute(null);
-      await client.index(index.uid).waitForTask(task.taskUid);
+      await client.index(index.uid).updateDistinctAttribute(null).waitTask();
 
       const response = await client.index(index.uid).getDistinctAttribute();
 
@@ -59,8 +57,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: Reset distinct attribute`, async () => {
       const client = await getClient(permission);
-      const task = await client.index(index.uid).resetDistinctAttribute();
-      await client.index(index.uid).waitForTask(task.taskUid);
+      await client.index(index.uid).resetDistinctAttribute().waitTask();
 
       const response = await client.index(index.uid).getDistinctAttribute();
 

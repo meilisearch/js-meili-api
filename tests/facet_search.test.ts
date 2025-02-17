@@ -45,8 +45,7 @@ describe.each([
     await client.index(index.uid).updateSettings({
       filterableAttributes: newFilterableAttributes,
     });
-    const { taskUid } = await client.index(index.uid).addDocuments(dataset);
-    await client.waitForTask(taskUid);
+    await client.index(index.uid).addDocuments(dataset).waitTask();
   });
 
   test(`${permission} key: basic facet value search`, async () => {

@@ -6,7 +6,7 @@
   afterAll,
   beforeAll,
 } from "vitest";
-import { ErrorStatusCode } from "../src/types.js";
+import { ErrorStatusCode } from "../src/types/index.js";
 import {
   clearAllIndexes,
   config,
@@ -30,8 +30,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     beforeEach(async () => {
       await clearAllIndexes(config);
       const client = await getClient("Master");
-      const { taskUid } = await client.index(index.uid).addDocuments(dataset);
-      await client.waitForTask(taskUid);
+      await client.index(index.uid).addDocuments(dataset).waitTask();
     });
 
     test(`${permission} key: Get default pagination settings`, async () => {
@@ -46,10 +45,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
       const newPagination = {
         maxTotalHits: 100,
       };
-      const task = await client
-        .index(index.uid)
-        .updatePagination(newPagination);
-      await client.waitForTask(task.taskUid);
+      await client.index(index.uid).updatePagination(newPagination).waitTask();
 
       const response = await client.index(index.uid).getPagination();
 
@@ -61,10 +57,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
       const newPagination = {
         maxTotalHits: null,
       };
-      const task = await client
-        .index(index.uid)
-        .updatePagination(newPagination);
-      await client.index(index.uid).waitForTask(task.taskUid);
+      await client.index(index.uid).updatePagination(newPagination).waitTask();
 
       const response = await client.index(index.uid).getPagination();
 
@@ -76,12 +69,8 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
       const newPagination = {
         maxTotalHits: 100,
       };
-      const updateTask = await client
-        .index(index.uid)
-        .updatePagination(newPagination);
-      await client.waitForTask(updateTask.taskUid);
-      const task = await client.index(index.uid).resetPagination();
-      await client.waitForTask(task.taskUid);
+      await client.index(index.uid).updatePagination(newPagination).waitTask();
+      await client.index(index.uid).resetPagination().waitTask();
 
       const response = await client.index(index.uid).getPagination();
 
@@ -95,8 +84,7 @@ describe.each([{ permission: "Search" }])(
   ({ permission }) => {
     beforeEach(async () => {
       const client = await getClient("Master");
-      const { taskUid } = await client.createIndex(index.uid);
-      await client.waitForTask(taskUid);
+      await client.createIndex(index.uid).waitTask();
     });
 
     test(`${permission} key: try to get pagination and be denied`, async () => {
@@ -127,8 +115,7 @@ describe.each([{ permission: "No" }])(
   ({ permission }) => {
     beforeAll(async () => {
       const client = await getClient("Master");
-      const { taskUid } = await client.createIndex(index.uid);
-      await client.waitForTask(taskUid);
+      await client.createIndex(index.uid).waitTask();
     });
 
     test(`${permission} key: try to get pagination and be denied`, async () => {

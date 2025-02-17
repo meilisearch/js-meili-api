@@ -6,8 +6,7 @@ import {
   expect,
   test,
 } from "vitest";
-import { ErrorStatusCode, type SearchResponse } from "../src/types.js";
-import { EnqueuedTask } from "../src/enqueued-task.js";
+import { ErrorStatusCode, type SearchResponse } from "../src/types/index.js";
 import {
   clearAllIndexes,
   config,
@@ -114,21 +113,16 @@ describe.each([
     const client = await getClient("Master");
     await clearAllIndexes(config);
 
-    const task1 = await client.createIndex(index.uid);
-    await client.waitForTask(task1.taskUid);
-    const task2 = await client.createIndex(emptyIndex.uid);
-    await client.waitForTask(task2.taskUid);
+    await client.createIndex(index.uid).waitTask();
+    await client.createIndex(emptyIndex.uid).waitTask();
 
     const newFilterableAttributes = ["genre", "title"];
-    const task: EnqueuedTask = await client
+    await client
       .index<Movie>(index.uid)
-      .updateFilterableAttributes(newFilterableAttributes);
+      .updateFilterableAttributes(newFilterableAttributes)
+      .waitTask();
 
-    await client.waitForTask(task.taskUid);
-    const { taskUid } = await client
-      .index<Movie>(index.uid)
-      .addDocuments(dataset);
-    await client.waitForTask(taskUid);
+    await client.index<Movie>(index.uid).addDocuments(dataset).waitTask();
   });
 
   test(`${permission} key: Basic search`, async () => {
@@ -399,8 +393,7 @@ describe.each([
   test(`${permission} key: Try to Search on deleted index and fail`, async () => {
     const client = await getClient(permission);
     const masterClient = await getClient("Master");
-    const { taskUid } = await masterClient.index<Movie>(index.uid).delete();
-    await masterClient.waitForTask(taskUid);
+    await masterClient.index<Movie>(index.uid).delete().waitTask();
 
     await expect(
       client.index<Movie>(index.uid).search("prince"),
@@ -416,10 +409,7 @@ describe.each([{ permission: "Master" }])(
       const client = await getClient("Master");
       await client.createIndex(index.uid);
 
-      const { taskUid: documentAdditionTask } = await client
-        .index(index.uid)
-        .addDocuments(datasetWithNests);
-      await client.waitForTask(documentAdditionTask);
+      await client.index(index.uid).addDocuments(datasetWithNests).waitTask();
     });
 
     test(`${permission} key: search on nested content with no parameters`, async () => {
@@ -434,12 +424,12 @@ describe.each([{ permission: "Master" }])(
 
     test(`${permission} key: search on nested content with searchable on specific nested field`, async () => {
       const client = await getClient(permission);
-      const { taskUid: settingsUpdateTask }: EnqueuedTask = await client
+      await client
         .index(index.uid)
         .updateSettings({
           searchableAttributes: ["title", "info.comment"],
-        });
-      await client.waitForTask(settingsUpdateTask);
+        })
+        .waitTask();
 
       const response: SearchResponse<NestedDocument> = await client
         .index<NestedDocument>(index.uid)
@@ -451,13 +441,13 @@ describe.each([{ permission: "Master" }])(
 
     test(`${permission} key: search on nested content with sort`, async () => {
       const client = await getClient(permission);
-      const { taskUid: settingsUpdateTask }: EnqueuedTask = await client
+      await client
         .index(index.uid)
         .updateSettings({
           searchableAttributes: ["title", "info.comment"],
           sortableAttributes: ["info.reviewNb"],
-        });
-      await client.waitForTask(settingsUpdateTask);
+        })
+        .waitTask();
 
       const response: SearchResponse<NestedDocument> = await client
         .index<NestedDocument>(index.uid)

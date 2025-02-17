@@ -1,5 +1,4 @@
 import { afterAll, expect, test, describe, beforeEach } from "vitest";
-import { EnqueuedTask } from "../src/enqueued-task.js";
 import {
   clearAllIndexes,
   config,
@@ -22,13 +21,12 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
   ({ permission }) => {
     beforeEach(async () => {
       const client = await getClient("Master");
-      const { taskUid } = await client.index(index.uid).addDocuments(dataset);
-      await client.waitForTask(taskUid);
+      await client.index(index.uid).addDocuments(dataset).waitTask();
     });
 
     test(`${permission} key: Get default dictionary`, async () => {
       const client = await getClient(permission);
-      const response: string[] = await client.index(index.uid).getDictionary();
+      const response = await client.index(index.uid).getDictionary();
 
       expect(response).toEqual([]);
     });
@@ -36,12 +34,9 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     test(`${permission} key: Update dictionary`, async () => {
       const client = await getClient(permission);
       const newDictionary = ["J. K.", "J. R. R."];
-      const task: EnqueuedTask = await client
-        .index(index.uid)
-        .updateDictionary(newDictionary);
-      await client.index(index.uid).waitForTask(task.taskUid);
+      await client.index(index.uid).updateDictionary(newDictionary).waitTask();
 
-      const response: string[] = await client.index(index.uid).getDictionary();
+      const response = await client.index(index.uid).getDictionary();
 
       expect(response).toEqual(newDictionary);
     });
@@ -49,24 +44,18 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     test(`${permission} key: Update dictionary with null value`, async () => {
       const client = await getClient(permission);
       const newDictionary = null;
-      const task: EnqueuedTask = await client
-        .index(index.uid)
-        .updateDictionary(newDictionary);
-      await client.index(index.uid).waitForTask(task.taskUid);
+      await client.index(index.uid).updateDictionary(newDictionary).waitTask();
 
-      const response: string[] = await client.index(index.uid).getDictionary();
+      const response = await client.index(index.uid).getDictionary();
 
       expect(response).toEqual([]);
     });
 
     test(`${permission} key: Reset dictionary`, async () => {
       const client = await getClient(permission);
-      const task: EnqueuedTask = await client
-        .index(index.uid)
-        .resetDictionary();
-      await client.index(index.uid).waitForTask(task.taskUid);
+      await client.index(index.uid).resetDictionary().waitTask();
 
-      const response: string[] = await client.index(index.uid).getDictionary();
+      const response = await client.index(index.uid).getDictionary();
 
       expect(response).toEqual([]);
     });

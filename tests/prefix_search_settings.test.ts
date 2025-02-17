@@ -1,5 +1,5 @@
 import { afterAll, expect, test, describe, beforeEach } from "vitest";
-import { ErrorStatusCode } from "../src/types.js";
+import { ErrorStatusCode } from "../src/types/index.js";
 import {
   clearAllIndexes,
   config,
@@ -23,8 +23,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     beforeEach(async () => {
       await clearAllIndexes(config);
       const client = await getClient("Master");
-      const { taskUid } = await client.index(index.uid).addDocuments(dataset);
-      await client.waitForTask(taskUid);
+      await client.index(index.uid).addDocuments(dataset).waitTask();
     });
 
     test(`${permission} key: Get prefixSearch settings on empty index`, async () => {
@@ -37,10 +36,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     test(`${permission} key: Set prefixSearch settings with dedicated endpoint on empty index`, async () => {
       const client = await getClient(permission);
 
-      const { taskUid } = await client
-        .index(index.uid)
-        .updatePrefixSearch("disabled");
-      await client.index(index.uid).waitForTask(taskUid);
+      await client.index(index.uid).updatePrefixSearch("disabled").waitTask();
 
       const updatedSettings = await client.index(index.uid).getPrefixSearch();
       expect(updatedSettings).toBe("disabled");
@@ -49,8 +45,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     test(`${permission} key: Reset prefixSearch settings on an empty index`, async () => {
       const client = await getClient(permission);
 
-      const { taskUid } = await client.index(index.uid).resetPrefixSearch();
-      await client.index(index.uid).waitForTask(taskUid);
+      await client.index(index.uid).resetPrefixSearch().waitTask();
 
       const response = await client.index(index.uid).getPrefixSearch();
       expect(response).toMatchSnapshot();
@@ -64,8 +59,7 @@ describe.each([{ permission: "Search" }])(
     beforeEach(async () => {
       await clearAllIndexes(config);
       const client = await getClient("Master");
-      const { taskUid } = await client.createIndex(index.uid);
-      await client.waitForTask(taskUid);
+      await client.createIndex(index.uid).waitTask();
     });
 
     test(`${permission} key: try to get prefix search settings and be denied`, async () => {
@@ -97,8 +91,7 @@ describe.each([{ permission: "No" }])(
     beforeEach(async () => {
       await clearAllIndexes(config);
       const client = await getClient("Master");
-      const { taskUid } = await client.createIndex(index.uid);
-      await client.waitForTask(taskUid);
+      await client.createIndex(index.uid).waitTask();
     });
 
     test(`${permission} key: try to get prefix search settings and be denied`, async () => {

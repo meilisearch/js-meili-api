@@ -23,8 +23,7 @@
 
     let error = 'NO ERRORS'
     try {
-      const task = await client.createIndex(UID)
-      await client.waitForTask(task.taskUid)
+      await client.createIndex(UID).waitTask()
       await fetch(`http://localhost:7700/indexes/${UID}/documents`, {
         method: 'POST',
         headers: {
@@ -41,8 +40,7 @@
     errorDiv.innerHTML = error
     document.body.insertBefore(errorDiv, document.querySelector("#content"));
 
-    const deleteTask = await client.index(UID).delete()
-    await client.waitForTask(deleteTask.taskUid)
+    await client.index(UID).delete().waitTask()
   })()
 
 

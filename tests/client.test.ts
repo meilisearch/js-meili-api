@@ -1,6 +1,6 @@
 import { afterAll, expect, test, describe, beforeEach } from "vitest";
-import type { Health, Version, Stats } from "../src/index.js";
-import { ErrorStatusCode, TaskTypes } from "../src/index.js";
+import type { Health, Version, Stats, IndexSwap } from "../src/index.js";
+import { ErrorStatusCode } from "../src/index.js";
 import { PACKAGE_VERSION } from "../src/package-version.js";
 import {
   clearAllIndexes,
@@ -216,8 +216,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
       expect(health).toBe(true);
 
-      const task = await client.createIndex("test");
-      await client.waitForTask(task.taskUid);
+      await client.createIndex("test").waitTask();
 
       const { results } = await client.getIndexes();
 
@@ -238,8 +237,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
       expect(health).toBe(true);
 
-      const task = await client.createIndex("test");
-      await client.waitForTask(task.taskUid);
+      await client.createIndex("test").waitTask();
 
       const { results } = await client.getIndexes();
 
@@ -247,10 +245,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
       const index = await client.getIndex("test");
 
-      const { taskUid } = await index.addDocuments([
-        { id: 1, title: "index_2" },
-      ]);
-      await client.waitForTask(taskUid);
+      await index.addDocuments([{ id: 1, title: "index_2" }]).waitTask();
 
       const { results: documents } = await index.getDocuments();
       expect(documents.length).toBe(1);
@@ -300,8 +295,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     describe("Test on indexes methods", () => {
       test(`${permission} key: create with no primary key`, async () => {
         const client = await getClient(permission);
-        const task = await client.createIndex(indexNoPk.uid);
-        await client.waitForTask(task.taskUid);
+        await client.createIndex(indexNoPk.uid).waitTask();
 
         const newIndex = await client.getIndex(indexNoPk.uid);
         expect(newIndex).toHaveProperty("uid", indexNoPk.uid);
@@ -320,10 +314,11 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
       test(`${permission} key: create with primary key`, async () => {
         const client = await getClient(permission);
-        const { taskUid } = await client.createIndex(indexPk.uid, {
-          primaryKey: indexPk.primaryKey,
-        });
-        await client.waitForTask(taskUid);
+        await client
+          .createIndex(indexPk.uid, {
+            primaryKey: indexPk.primaryKey,
+          })
+          .waitTask();
 
         const newIndex = await client.getIndex(indexPk.uid);
 
@@ -343,8 +338,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
       test(`${permission} key: get all indexes when not empty`, async () => {
         const client = await getClient(permission);
 
-        const { taskUid } = await client.createIndex(indexPk.uid);
-        await client.waitForTask(taskUid);
+        await client.createIndex(indexPk.uid).waitTask();
 
         const { results } = await client.getRawIndexes();
         const indexes = results.map((index: any) => index.uid);
@@ -355,8 +349,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
       test(`${permission} key: Get index that exists`, async () => {
         const client = await getClient(permission);
 
-        const { taskUid } = await client.createIndex(indexPk.uid);
-        await client.waitForTask(taskUid);
+        await client.createIndex(indexPk.uid).waitTask();
 
         const response = await client.getIndex(indexPk.uid);
 
@@ -374,12 +367,12 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
       test(`${permission} key: update primary key`, async () => {
         const client = await getClient(permission);
-        const { taskUid: createTask } = await client.createIndex(indexPk.uid);
-        await client.waitForTask(createTask);
-        const { taskUid: updateTask } = await client.updateIndex(indexPk.uid, {
-          primaryKey: "newPrimaryKey",
-        });
-        await client.waitForTask(updateTask);
+        await client.createIndex(indexPk.uid).waitTask();
+        await client
+          .updateIndex(indexPk.uid, {
+            primaryKey: "newPrimaryKey",
+          })
+          .waitTask();
 
         const index = await client.getIndex(indexPk.uid);
 
@@ -389,14 +382,16 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
       test(`${permission} key: update primary key that already exists`, async () => {
         const client = await getClient(permission);
-        const { taskUid: createTask } = await client.createIndex(indexPk.uid, {
-          primaryKey: indexPk.primaryKey,
-        });
-        await client.waitForTask(createTask);
-        const { taskUid: updateTask } = await client.updateIndex(indexPk.uid, {
-          primaryKey: "newPrimaryKey",
-        });
-        await client.waitForTask(updateTask);
+        await client
+          .createIndex(indexPk.uid, {
+            primaryKey: indexPk.primaryKey,
+          })
+          .waitTask();
+        await client
+          .updateIndex(indexPk.uid, {
+            primaryKey: "newPrimaryKey",
+          })
+          .waitTask();
 
         const index = await client.getIndex(indexPk.uid);
 
@@ -406,11 +401,9 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
       test(`${permission} key: delete index`, async () => {
         const client = await getClient(permission);
-        const { taskUid: createTask } = await client.createIndex(indexNoPk.uid);
-        await client.waitForTask(createTask);
+        await client.createIndex(indexNoPk.uid).waitTask();
 
-        const { taskUid: deleteTask } = await client.deleteIndex(indexNoPk.uid);
-        await client.waitForTask(deleteTask);
+        await client.deleteIndex(indexNoPk.uid).waitTask();
         const { results } = await client.getIndexes();
 
         expect(results).toHaveLength(0);
@@ -418,11 +411,9 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
       test(`${permission} key: create index with already existing uid should fail`, async () => {
         const client = await getClient(permission);
-        const { taskUid: firstCreate } = await client.createIndex(indexPk.uid);
-        await client.waitForTask(firstCreate);
+        await client.createIndex(indexPk.uid).waitTask();
 
-        const { taskUid: secondCreate } = await client.createIndex(indexPk.uid);
-        const task = await client.waitForTask(secondCreate);
+        const task = await client.createIndex(indexPk.uid).waitTask();
 
         expect(task.status).toBe("failed");
       });
@@ -430,9 +421,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
       test(`${permission} key: delete index with uid that does not exist should fail`, async () => {
         const client = await getClient(permission);
         const index = client.index(indexNoPk.uid);
-        const { taskUid } = await index.delete();
-
-        const task = await client.waitForTask(taskUid);
+        const task = await index.delete().waitTask();
 
         expect(task.status).toEqual("failed");
       });
@@ -451,60 +440,48 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
         await client
           .index(index.uid)
           .addDocuments([{ id: 1, title: `index_1` }]);
-        const { taskUid } = await client
+        await client
           .index(index2.uid)
-          .addDocuments([{ id: 1, title: "index_2" }]);
-        await client.waitForTask(taskUid);
-        const swaps = [
-          {
-            indexes: [index.uid, index2.uid],
-          },
-        ];
+          .addDocuments([{ id: 1, title: "index_2" }])
+          .waitTask();
+        const swaps: IndexSwap[] = [{ indexes: [index.uid, index2.uid] }];
 
-        const swapTask = await client.swapIndexes(swaps);
-        const resolvedTask = await client.waitForTask(swapTask.taskUid);
+        const resolvedTask = await client.swapIndexes(swaps).waitTask();
         const docIndex1 = await client.index(index.uid).getDocument(1);
         const docIndex2 = await client.index(index2.uid).getDocument(1);
 
         expect(docIndex1.title).toEqual("index_2");
         expect(docIndex2.title).toEqual("index_1");
-        expect(resolvedTask.type).toEqual(TaskTypes.INDEXES_SWAP);
-        expect(resolvedTask.details.swaps).toEqual(swaps);
+        expect(resolvedTask.type).toEqual("indexSwap");
+        expect(resolvedTask.details!.swaps).toEqual(swaps);
       });
 
       test(`${permission} key: Swap two indexes with one that does not exist`, async () => {
         const client = await getClient(permission);
 
-        const { taskUid } = await client
+        await client
           .index(index2.uid)
-          .addDocuments([{ id: 1, title: "index_2" }]);
+          .addDocuments([{ id: 1, title: "index_2" }])
+          .waitTask();
 
-        await client.waitForTask(taskUid);
-        const swaps = [
-          {
-            indexes: ["does_not_exist", index2.uid],
-          },
+        const swaps: IndexSwap[] = [
+          { indexes: ["does_not_exist", index2.uid] },
         ];
 
-        const swapTask = await client.swapIndexes(swaps);
-        const resolvedTask = await client.waitForTask(swapTask.taskUid);
+        const resolvedTask = await client.swapIndexes(swaps).waitTask();
 
-        expect(resolvedTask.type).toEqual(TaskTypes.INDEXES_SWAP);
+        expect(resolvedTask.type).toEqual("indexSwap");
         expect(resolvedTask.error?.code).toEqual(
           ErrorStatusCode.INDEX_NOT_FOUND,
         );
-        expect(resolvedTask.details.swaps).toEqual(swaps);
+        expect(resolvedTask.details!.swaps).toEqual(swaps);
       });
 
       // Should be fixed by rc1
       test(`${permission} key: Swap two one index with itself`, async () => {
         const client = await getClient(permission);
 
-        const swaps = [
-          {
-            indexes: [index.uid, index.uid],
-          },
-        ];
+        const swaps: IndexSwap[] = [{ indexes: [index.uid, index.uid] }];
 
         await expect(client.swapIndexes(swaps)).rejects.toHaveProperty(
           "cause.code",

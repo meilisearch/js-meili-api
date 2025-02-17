@@ -1,5 +1,5 @@
 import { afterAll, beforeEach, describe, expect, test } from "vitest";
-import { ErrorStatusCode } from "../src/types.js";
+import { ErrorStatusCode } from "../src/types/index.js";
 import {
   clearAllIndexes,
   config,
@@ -33,8 +33,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     beforeEach(async () => {
       await clearAllIndexes(config);
       const client = await getClient("master");
-      const { taskUid } = await client.index(index.uid).addDocuments(dataset);
-      await client.waitForTask(taskUid);
+      await client.index(index.uid).addDocuments(dataset).waitTask();
     });
 
     test(`${permission} key: Get default typo tolerance settings`, async () => {
@@ -54,10 +53,10 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
         disableOnWords: ["title"],
         disableOnAttributes: ["hello"],
       };
-      const task = await client
+      await client
         .index(index.uid)
-        .updateTypoTolerance(newTypoTolerance);
-      await client.index(index.uid).waitForTask(task.taskUid);
+        .updateTypoTolerance(newTypoTolerance)
+        .waitTask();
 
       const response = await client.index(index.uid).getTypoTolerance();
 
@@ -66,8 +65,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: Update typo tolerance using null as value`, async () => {
       const client = await getClient(permission);
-      const task = await client.index(index.uid).updateTypoTolerance(null);
-      await client.index(index.uid).waitForTask(task.taskUid);
+      await client.index(index.uid).updateTypoTolerance(null).waitTask();
 
       const response = await client.index(index.uid).getTypoTolerance();
 
@@ -76,8 +74,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: Reset typo tolerance settings`, async () => {
       const client = await getClient(permission);
-      const task = await client.index(index.uid).resetTypoTolerance();
-      await client.index(index.uid).waitForTask(task.taskUid);
+      await client.index(index.uid).resetTypoTolerance().waitTask();
 
       const response = await client.index(index.uid).getTypoTolerance();
 

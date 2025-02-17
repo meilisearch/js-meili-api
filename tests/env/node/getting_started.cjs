@@ -25,11 +25,7 @@ const { MeiliSearch } = require('../../../dist/cjs/index.cjs')
     'id'
   ])
 
-  let response = await index.addDocuments(dataset)
-
-  console.log(response) // => { "updateId": 0 }
-
-  await client.waitForTask(response.taskUid)
+  await index.addDocuments(dataset).waitTask()
 
   const search = await index.search('philoudelphia')
   console.log({ search, hit: search.hits })

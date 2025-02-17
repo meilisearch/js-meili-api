@@ -1,6 +1,5 @@
 import { afterAll, beforeEach, describe, expect, test } from "vitest";
-import { ErrorStatusCode } from "../src/types.js";
-import { EnqueuedTask } from "../src/enqueued-task.js";
+import { ErrorStatusCode } from "../src/types/index.js";
 import {
   clearAllIndexes,
   config,
@@ -23,13 +22,12 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
   ({ permission }) => {
     beforeEach(async () => {
       const client = await getClient("Master");
-      const { taskUid } = await client.index(index.uid).addDocuments(dataset);
-      await client.waitForTask(taskUid);
+      await client.index(index.uid).addDocuments(dataset).waitTask();
     });
 
     test(`${permission} key: Get default stop words`, async () => {
       const client = await getClient(permission);
-      const response: string[] = await client.index(index.uid).getStopWords();
+      const response = await client.index(index.uid).getStopWords();
 
       expect(response).toEqual([]);
     });
@@ -37,12 +35,9 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     test(`${permission} key: Update stop words`, async () => {
       const client = await getClient(permission);
       const newStopWords = ["the"];
-      const task: EnqueuedTask = await client
-        .index(index.uid)
-        .updateStopWords(newStopWords);
-      await client.index(index.uid).waitForTask(task.taskUid);
+      await client.index(index.uid).updateStopWords(newStopWords).waitTask();
 
-      const response: string[] = await client.index(index.uid).getStopWords();
+      const response = await client.index(index.uid).getStopWords();
 
       expect(response).toEqual(newStopWords);
     });
@@ -50,22 +45,18 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     test(`${permission} key: Update stop words with null value`, async () => {
       const client = await getClient(permission);
       const newStopWords = null;
-      const task: EnqueuedTask = await client
-        .index(index.uid)
-        .updateStopWords(newStopWords);
-      await client.index(index.uid).waitForTask(task.taskUid);
+      await client.index(index.uid).updateStopWords(newStopWords).waitTask();
 
-      const response: string[] = await client.index(index.uid).getStopWords();
+      const response = await client.index(index.uid).getStopWords();
 
       expect(response).toEqual([]);
     });
 
     test(`${permission} key: Reset stop words`, async () => {
       const client = await getClient(permission);
-      const task: EnqueuedTask = await client.index(index.uid).resetStopWords();
-      await client.index(index.uid).waitForTask(task.taskUid);
+      await client.index(index.uid).resetStopWords().waitTask();
 
-      const response: string[] = await client.index(index.uid).getStopWords();
+      const response = await client.index(index.uid).getStopWords();
 
       expect(response).toEqual([]);
     });

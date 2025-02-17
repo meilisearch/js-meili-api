@@ -6,7 +6,7 @@ import {
   afterAll,
   beforeAll,
 } from "vitest";
-import { ErrorStatusCode } from "../src/types.js";
+import { ErrorStatusCode } from "../src/types/index.js";
 import {
   clearAllIndexes,
   config,
@@ -30,13 +30,9 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     beforeEach(async () => {
       await clearAllIndexes(config);
       const client = await getClient("Master");
-      const { taskUid } = await client.createIndex(index.uid);
-      await client.waitForTask(taskUid);
+      await client.createIndex(index.uid).waitTask();
 
-      const { taskUid: docTask } = await client
-        .index(index.uid)
-        .addDocuments(dataset);
-      await client.waitForTask(docTask);
+      await client.index(index.uid).addDocuments(dataset).waitTask();
     });
 
     test(`${permission} key: Get default faceting object`, async () => {
@@ -53,8 +49,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
         maxValuesPerFacet: 12,
         sortFacetValuesBy: { test: "count" as "count" },
       };
-      const task = await client.index(index.uid).updateFaceting(newFaceting);
-      await client.index(index.uid).waitForTask(task.taskUid);
+      await client.index(index.uid).updateFaceting(newFaceting).waitTask();
 
       const response = await client.index(index.uid).getFaceting();
 
@@ -63,10 +58,10 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: Update faceting at null`, async () => {
       const client = await getClient(permission);
-      const task = await client
+      await client
         .index(index.uid)
-        .updateFaceting({ maxValuesPerFacet: null });
-      await client.index(index.uid).waitForTask(task.taskUid);
+        .updateFaceting({ maxValuesPerFacet: null })
+        .waitTask();
 
       const response = await client.index(index.uid).getFaceting();
 
@@ -77,15 +72,10 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
       const client = await getClient(permission);
       await client
         .index(index.uid)
-        .waitForTask(
-          (
-            await client
-              .index(index.uid)
-              .updateFaceting({ maxValuesPerFacet: 12 })
-          ).taskUid,
-        );
-      const task = await client.index(index.uid).resetFaceting();
-      await client.index(index.uid).waitForTask(task.taskUid);
+        .updateFaceting({ maxValuesPerFacet: 12 })
+        .waitTask();
+
+      await client.index(index.uid).resetFaceting().waitTask();
 
       const response = await client.index(index.uid).getFaceting();
 
@@ -99,8 +89,7 @@ describe.each([{ permission: "Search" }])(
   ({ permission }) => {
     beforeEach(async () => {
       const client = await getClient("Master");
-      const { taskUid } = await client.createIndex(index.uid);
-      await client.waitForTask(taskUid);
+      await client.createIndex(index.uid).waitTask();
     });
 
     test(`${permission} key: try to get faceting and be denied`, async () => {
@@ -129,8 +118,7 @@ describe.each([{ permission: "Search" }])(
 describe.each([{ permission: "No" }])("Test on faceting", ({ permission }) => {
   beforeAll(async () => {
     const client = await getClient("Master");
-    const { taskUid } = await client.createIndex(index.uid);
-    await client.waitForTask(taskUid);
+    await client.createIndex(index.uid).waitTask();
   });
 
   test(`${permission} key: try to get faceting and be denied`, async () => {
@@ -182,7 +170,7 @@ describe.each([
     const client = new MeiliSearch({ host });
     const strippedHost = trailing ? host.slice(0, -1) : host;
     await expect(
-      client.index(index.uid).updateFaceting({ maxValuesPerFacet: null }),
+      client.index(index.uid).updateFaceting({ maxValuesPerFacet: undefined }),
     ).rejects.toHaveProperty(
       "message",
       `Request to ${strippedHost}/${route} has failed`,

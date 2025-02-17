@@ -1,5 +1,4 @@
 import { afterAll, beforeEach, describe, expect, test } from "vitest";
-import { EnqueuedTask } from "../src/enqueued-task.js";
 import {
   clearAllIndexes,
   config,
@@ -22,15 +21,12 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
   ({ permission }) => {
     beforeEach(async () => {
       const client = await getClient("Master");
-      const { taskUid } = await client.index(index.uid).addDocuments(dataset);
-      await client.waitForTask(taskUid);
+      await client.index(index.uid).addDocuments(dataset).waitTask();
     });
 
     test(`${permission} key: Get default separator tokens`, async () => {
       const client = await getClient(permission);
-      const response: string[] = await client
-        .index(index.uid)
-        .getSeparatorTokens();
+      const response = await client.index(index.uid).getSeparatorTokens();
 
       expect(response).toEqual([]);
     });
@@ -38,14 +34,12 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     test(`${permission} key: Update separator tokens`, async () => {
       const client = await getClient(permission);
       const newSeparatorTokens = ["&sep", "/", "|"];
-      const task: EnqueuedTask = await client
+      await client
         .index(index.uid)
-        .updateSeparatorTokens(newSeparatorTokens);
-      await client.index(index.uid).waitForTask(task.taskUid);
+        .updateSeparatorTokens(newSeparatorTokens)
+        .waitTask();
 
-      const response: string[] = await client
-        .index(index.uid)
-        .getSeparatorTokens();
+      const response = await client.index(index.uid).getSeparatorTokens();
 
       expect(response).toEqual(newSeparatorTokens);
     });
@@ -53,28 +47,21 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     test(`${permission} key: Update separator tokens with null value`, async () => {
       const client = await getClient(permission);
       const newSeparatorTokens = null;
-      const task: EnqueuedTask = await client
+      await client
         .index(index.uid)
-        .updateSeparatorTokens(newSeparatorTokens);
-      await client.index(index.uid).waitForTask(task.taskUid);
+        .updateSeparatorTokens(newSeparatorTokens)
+        .waitTask();
 
-      const response: string[] = await client
-        .index(index.uid)
-        .getSeparatorTokens();
+      const response = await client.index(index.uid).getSeparatorTokens();
 
       expect(response).toEqual([]);
     });
 
     test(`${permission} key: Reset separator tokens`, async () => {
       const client = await getClient(permission);
-      const task: EnqueuedTask = await client
-        .index(index.uid)
-        .resetSeparatorTokens();
-      await client.index(index.uid).waitForTask(task.taskUid);
+      await client.index(index.uid).resetSeparatorTokens().waitTask();
 
-      const response: string[] = await client
-        .index(index.uid)
-        .getSeparatorTokens();
+      const response = await client.index(index.uid).getSeparatorTokens();
 
       expect(response).toEqual([]);
     });

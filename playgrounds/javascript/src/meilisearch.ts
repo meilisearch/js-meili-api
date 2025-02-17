@@ -12,23 +12,22 @@ const index = client.index<{ id: number; title: string; genres: string[] }>(
 export async function addDocuments(): Promise<void> {
   await client.deleteIndexIfExists(indexUid);
 
-  const task1 = await client.createIndex(indexUid);
-  await client.waitForTask(task1.taskUid);
+  await client.createIndex(indexUid).waitTask();
 
-  const task2 = await index.addDocuments([
-    { id: 1, title: "Carol", genres: ["Romance", "Drama"] },
-    { id: 2, title: "Wonder Woman", genres: ["Action", "Adventure"] },
-    { id: 3, title: "Life of Pi", genres: ["Adventure", "Drama"] },
-    {
-      id: 4,
-      title: "Mad Max: Fury Road",
-      genres: ["Adventure", "Science Fiction"],
-    },
-    { id: 5, title: "Moana", genres: ["Fantasy", "Action"] },
-    { id: 6, title: "Philadelphia", genres: ["Drama"] },
-  ]);
-
-  await client.index(indexUid).waitForTask(task2.taskUid);
+  await index
+    .addDocuments([
+      { id: 1, title: "Carol", genres: ["Romance", "Drama"] },
+      { id: 2, title: "Wonder Woman", genres: ["Action", "Adventure"] },
+      { id: 3, title: "Life of Pi", genres: ["Adventure", "Drama"] },
+      {
+        id: 4,
+        title: "Mad Max: Fury Road",
+        genres: ["Adventure", "Science Fiction"],
+      },
+      { id: 5, title: "Moana", genres: ["Fantasy", "Action"] },
+      { id: 6, title: "Philadelphia", genres: ["Drama"] },
+    ])
+    .waitTask();
 }
 
 export async function getAllHits(element: HTMLDivElement): Promise<void> {

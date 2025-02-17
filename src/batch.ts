@@ -1,70 +1,38 @@
 import type {
-  Config,
-  BatchObject,
-  BatchesQuery,
+  Batch,
   BatchesResults,
-  BatchesResultsObject,
-} from "./types.js";
-import { HttpRequests, toQueryParams } from "./http-requests.js";
+  TasksOrBatchesQuery,
+} from "./types/index.js";
+import { type HttpRequests, toQueryParams } from "./http-requests.js";
 
-class Batch {
-  uid: BatchObject["uid"];
-  details: BatchObject["details"];
-  stats: BatchObject["stats"];
-  startedAt: BatchObject["startedAt"];
-  finishedAt: BatchObject["finishedAt"];
-  duration: BatchObject["duration"];
-  progress: BatchObject["progress"];
+/**
+ * Class for handling batches.
+ *
+ * @see {@link https://www.meilisearch.com/docs/reference/api/batches}
+ */
+export class BatchClient {
+  readonly #httpRequest: HttpRequests;
 
-  constructor(batch: BatchObject) {
-    this.uid = batch.uid;
-    this.details = batch.details;
-    this.stats = batch.stats;
-    this.startedAt = batch.startedAt;
-    this.finishedAt = batch.finishedAt;
-    this.duration = batch.duration;
-    this.progress = batch.progress;
-  }
-}
-
-class BatchClient {
-  httpRequest: HttpRequests;
-
-  constructor(config: Config) {
-    this.httpRequest = new HttpRequests(config);
+  constructor(httpRequests: HttpRequests) {
+    this.#httpRequest = httpRequests;
   }
 
-  /**
-   * Get one batch
-   *
-   * @param uid - Unique identifier of the batch
-   * @returns
-   */
+  /** {@link https://www.meilisearch.com/docs/reference/api/batches#get-one-batch} */
   async getBatch(uid: number): Promise<Batch> {
     const url = `batches/${uid}`;
-    const batch = await this.httpRequest.get<BatchObject>(url);
-    return new Batch(batch);
+    const batch = await this.#httpRequest.get<Batch>(url);
+    return batch;
   }
 
-  /**
-   * Get batches
-   *
-   * @param parameters - Parameters to browse the batches
-   * @returns Promise containing all batches
-   */
-  async getBatches(parameters: BatchesQuery = {}): Promise<BatchesResults> {
+  /** {@link https://www.meilisearch.com/docs/reference/api/batches#get-batches} */
+  async getBatches(parameters?: TasksOrBatchesQuery): Promise<BatchesResults> {
     const url = `batches`;
 
-    const batches = await this.httpRequest.get<Promise<BatchesResultsObject>>(
+    const batches = await this.#httpRequest.get<Promise<BatchesResults>>(
       url,
-      toQueryParams<BatchesQuery>(parameters),
+      toQueryParams<TasksOrBatchesQuery>(parameters ?? {}),
     );
 
-    return {
-      ...batches,
-      results: batches.results.map((batch) => new Batch(batch)),
-    };
+    return batches;
   }
 }
-
-export { BatchClient, Batch };

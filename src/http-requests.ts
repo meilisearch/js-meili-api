@@ -1,4 +1,4 @@
-import type { Config, EnqueuedTaskObject } from "./types.js";
+import type { Config, EnqueuedTask } from "./types/index.js";
 import { PACKAGE_VERSION } from "./package-version.js";
 
 import {
@@ -229,7 +229,7 @@ class HttpRequests {
     });
   }
 
-  async post<T = any, R = EnqueuedTaskObject>(
+  async post<T = any, R = EnqueuedTask>(
     url: string,
     data?: T,
     params?: { [key: string]: any },
@@ -251,7 +251,7 @@ class HttpRequests {
     });
   }
 
-  async put<T = any, R = EnqueuedTaskObject>(
+  async put<T = any, R = EnqueuedTask>(
     url: string,
     data?: T,
     params?: { [key: string]: any },
@@ -293,7 +293,7 @@ class HttpRequests {
     data?: any,
     params?: { [key: string]: any },
     config?: Record<string, any>,
-  ): Promise<EnqueuedTaskObject>;
+  ): Promise<EnqueuedTask>;
   async delete<T>(
     url: string,
     data?: any,

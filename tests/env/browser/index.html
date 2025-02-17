@@ -23,11 +23,9 @@
         host: 'http://localhost:7700',
         apiKey: 'masterKey',
       })
-      const task = await client.createIndex(UID)
-      await client.waitForTask(task.taskUid)
+      await client.createIndex(UID).waitTask()
 
-      const documentTask = await client.index(UID).addDocuments([{ id: 1, title: "wonder woman" }])
-      await client.waitForTask(documentTask.taskUid)
+      await client.index(UID).addDocuments([{ id: 1, title: "wonder woman" }]).waitTask()
 
       const index = await client.index(UID).getRawInfo()
 
@@ -43,8 +41,7 @@
       searchDiv.innerHTML = JSON.stringify(search)
       document.body.insertBefore(searchDiv, document.querySelector("#content"));
 
-      const deleteTask = await client.index(UID).delete()
-      await client.waitForTask(deleteTask.uid)
+      await client.index(UID).delete().waitTask()
     } catch (e) {
       console.error(e);
     }

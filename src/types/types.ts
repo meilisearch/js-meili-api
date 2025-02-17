@@ -4,8 +4,7 @@
 // Definitions: https://github.com/meilisearch/meilisearch-js
 // TypeScript Version: ^3.8.3
 
-import { Task } from "./task.js";
-import { Batch } from "./batch.js";
+import type { WaitOptions } from "./task_and_batch.js";
 
 export type Config = {
   host: string;
@@ -14,6 +13,7 @@ export type Config = {
   requestConfig?: Partial<Omit<RequestInit, "body" | "method">>;
   httpClient?: (input: string, init?: RequestInit) => Promise<any>;
   timeout?: number;
+  defaultWaitOptions?: WaitOptions;
 };
 
 ///
@@ -43,8 +43,8 @@ export type IndexOptions = {
 export type IndexObject = {
   uid: string;
   primaryKey?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type IndexesQuery = ResourceQuery & {};
@@ -527,247 +527,6 @@ export type Settings = {
 };
 
 /*
- ** TASKS
- */
-
-export const TaskStatus = {
-  TASK_SUCCEEDED: "succeeded",
-  TASK_PROCESSING: "processing",
-  TASK_FAILED: "failed",
-  TASK_ENQUEUED: "enqueued",
-  TASK_CANCELED: "canceled",
-} as const;
-
-export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus];
-
-export const TaskTypes = {
-  DOCUMENTS_ADDITION_OR_UPDATE: "documentAdditionOrUpdate",
-  DOCUMENT_DELETION: "documentDeletion",
-  DUMP_CREATION: "dumpCreation",
-  INDEX_CREATION: "indexCreation",
-  INDEX_DELETION: "indexDeletion",
-  INDEXES_SWAP: "indexSwap",
-  INDEX_UPDATE: "indexUpdate",
-  SETTINGS_UPDATE: "settingsUpdate",
-  SNAPSHOT_CREATION: "snapshotCreation",
-  TASK_CANCELATION: "taskCancelation",
-  TASK_DELETION: "taskDeletion",
-} as const;
-
-export type TaskTypes = (typeof TaskTypes)[keyof typeof TaskTypes];
-
-export type TasksQuery = {
-  indexUids?: string[];
-  uids?: number[];
-  types?: TaskTypes[];
-  statuses?: TaskStatus[];
-  canceledBy?: number[];
-  beforeEnqueuedAt?: Date;
-  afterEnqueuedAt?: Date;
-  beforeStartedAt?: Date;
-  afterStartedAt?: Date;
-  beforeFinishedAt?: Date;
-  afterFinishedAt?: Date;
-  limit?: number;
-  from?: number;
-  /**
-   * If true, the tasks are returned in reverse order (requires Meilisearch
-   * 1.12.0 or later)
-   */
-  reverse?: boolean;
-};
-
-export type CancelTasksQuery = Omit<TasksQuery, "limit" | "from"> & {};
-
-export type DeleteTasksQuery = Omit<TasksQuery, "limit" | "from"> & {};
-
-export type EnqueuedTaskObject = {
-  taskUid: number;
-  indexUid?: string;
-  status: TaskStatus;
-  type: TaskTypes;
-  enqueuedAt: string;
-  canceledBy: number;
-};
-
-export type TaskObject = Omit<EnqueuedTaskObject, "taskUid"> & {
-  uid: number;
-  /** The UID of the batch that the task belongs to (`null` for enqueued tasks) */
-  batchUid: number | null;
-  details: {
-    // Number of documents sent
-    receivedDocuments?: number;
-
-    // Number of documents successfully indexed/updated in Meilisearch
-    indexedDocuments?: number;
-
-    // Number of deleted documents
-    deletedDocuments?: number;
-
-    // Number of documents found on a batch-delete
-    providedIds?: number;
-
-    // Primary key on index creation
-    primaryKey?: string;
-
-    // Ranking rules on settings actions
-    rankingRules?: RankingRules;
-
-    // Searchable attributes on settings actions
-    searchableAttributes?: SearchableAttributes;
-
-    // Displayed attributes on settings actions
-    displayedAttributes?: DisplayedAttributes;
-
-    // Filterable attributes on settings actions
-    filterableAttributes?: FilterableAttributes;
-
-    // Sortable attributes on settings actions
-    sortableAttributes?: SortableAttributes;
-
-    // Stop words on settings actions
-    stopWords?: StopWords;
-
-    // Stop words on settings actions
-    synonyms?: Synonyms;
-
-    // Distinct attribute on settings actions
-    distinctAttribute?: DistinctAttribute;
-
-    // Object containing the payload originating the `indexSwap` task creation
-    swaps?: SwapIndexesParams;
-
-    // Number of tasks that matched the originalQuery filter
-    matchedTasks?: number;
-
-    // Number of tasks that were canceled
-    canceledTasks?: number;
-
-    // Number of tasks that were deleted
-    deletedTasks?: number;
-
-    // Query parameters used to filter the tasks
-    originalFilter?: string;
-  };
-  error: MeiliSearchErrorResponse | null;
-  duration: string;
-  startedAt: string;
-  finishedAt: string;
-};
-
-export type SwapIndexesParams = Array<{
-  indexes: string[];
-}>;
-
-type CursorResults<T> = {
-  results: T[];
-  limit: number;
-  from: number;
-  next: number;
-  total: number;
-};
-
-export type TasksResults = CursorResults<Task>;
-export type TasksResultsObject = CursorResults<TaskObject>;
-
-export type WaitOptions = {
-  timeOutMs?: number;
-  intervalMs?: number;
-};
-
-/*
- ** BATCHES
- */
-
-/**
- * Represents a batch operation object containing information about tasks
- * processing
- */
-export type BatchObject = {
-  /** Unique identifier for the batch */
-  uid: number;
-
-  /** Details about document processing */
-  details: {
-    /** Number of documents received in the batch */
-    receivedDocuments?: number;
-    /** Number of documents successfully indexed */
-    indexedDocuments?: number;
-    /** Number of documents deleted in the batch */
-    deletedDocuments?: number;
-  };
-
-  /** Progress and indexing step of the batch, null if the batch is finished */
-  progress: null | {
-    /** An array of all the steps currently being processed */
-    steps: Array<{
-      /**
-       * A string representing the name of the current step NOT stable. Only use
-       * for debugging purposes.
-       */
-      currentStep: string;
-      /** Number of finished tasks */
-      finished: number;
-      /** Total number of tasks to finish before moving to the next step */
-      total: number;
-    }>;
-    /** Percentage of progression of all steps currently being processed */
-    percentage: number;
-  };
-
-  /** Statistics about tasks within the batch */
-  stats: {
-    /** Total number of tasks in the batch */
-    totalNbTasks: number;
-    /** Count of tasks in each status */
-    status: {
-      /** Number of successfully completed tasks */
-      succeeded: number;
-      /** Number of failed tasks */
-      failed: number;
-      /** Number of canceled tasks */
-      canceled: number;
-      /** Number of tasks currently processing */
-      processing: number;
-      /** Number of tasks waiting to be processed */
-      enqueued: number;
-    };
-    /** Count of tasks by type */
-    types: Record<TaskTypes, number>;
-    /** Count of tasks by index UID */
-    indexUids: Record<string, number>;
-  };
-
-  /** Timestamp when the batch started processing (rfc3339 format) */
-  startedAt: string;
-  /** Timestamp when the batch finished processing (rfc3339 format) */
-  finishedAt: string;
-  /** Duration of batch processing */
-  duration: string;
-};
-
-export type BatchesQuery = {
-  /** The batch should contain the specified task UIDs */
-  uids?: number[];
-  batchUids?: number[];
-  types?: TaskTypes[];
-  statuses?: TaskStatus[];
-  indexUids?: string[];
-  canceledBy?: number[];
-  beforeEnqueuedAt?: Date;
-  afterEnqueuedAt?: Date;
-  beforeStartedAt?: Date;
-  afterStartedAt?: Date;
-  beforeFinishedAt?: Date;
-  afterFinishedAt?: Date;
-  limit?: number;
-  from?: number;
-};
-
-export type BatchesResults = CursorResults<Batch>;
-export type BatchesResultsObject = CursorResults<BatchObject>;
-
-/*
  *** HEALTH
  */
 
@@ -855,7 +614,7 @@ export type MeiliSearchErrorResponse = {
   link: string;
 };
 
-// @TODO: This doesn't seem to be up to date, and its usefullness comes into question.
+// @TODO: This doesn't seem to be up to date, and its usefulness comes into question.
 export const ErrorStatusCode = {
   /** @see https://www.meilisearch.com/docs/reference/errors/error_codes#index_creation_failed */
   INDEX_CREATION_FAILED: "index_creation_failed",
@@ -1220,59 +979,3 @@ export const ErrorStatusCode = {
 
 export type ErrorStatusCode =
   (typeof ErrorStatusCode)[keyof typeof ErrorStatusCode];
-
-/** @see {@link TokenSearchRules} */
-export type TokenIndexRules = { filter?: Filter };
-
-/**
- * {@link https://www.meilisearch.com/docs/learn/security/tenant_token_reference#search-rules}
- *
- * @remarks
- * Not well documented.
- * @see {@link https://github.com/meilisearch/meilisearch/blob/b21d7aedf9096539041362d438e973a18170f3fc/crates/meilisearch-auth/src/lib.rs#L271-L277 | GitHub source code}
- */
-export type TokenSearchRules =
-  | Record<string, TokenIndexRules | null>
-  | string[];
-
-/** Options object for tenant token generation. */
-export type TenantTokenGeneratorOptions = {
-  /** API key used to sign the token. */
-  apiKey: string;
-  /**
-   * The uid of the api key used as issuer of the token.
-   *
-   * @see {@link https://www.meilisearch.com/docs/learn/security/tenant_token_reference#api-key-uid}
-   */
-  apiKeyUid: string;
-  /**
-   * Search rules that are applied to every search.
-   *
-   * @defaultValue `["*"]`
-   */
-  searchRules?: TokenSearchRules;
-  /**
-   * {@link https://en.wikipedia.org/wiki/Unix_time | UNIX timestamp} or
-   * {@link Date} object at which the token expires.
-   *
-   * @see {@link https://www.meilisearch.com/docs/learn/security/tenant_token_reference#expiry-date}
-   */
-  expiresAt?: number | Date;
-  /**
-   * Encryption algorithm used to sign the JWT. Supported values by Meilisearch
-   * are HS256, HS384, HS512. (HS[number] means HMAC using SHA-[number])
-   *
-   * @defaultValue `"HS256"`
-   * @see {@link https://www.meilisearch.com/docs/learn/security/generate_tenant_token_scratch#prepare-token-header}
-   */
-  algorithm?: `HS${256 | 384 | 512}`;
-  /**
-   * By default if a non-safe environment is detected, an error is thrown.
-   * Setting this to `true` skips environment detection. This is intended for
-   * server-side environments where detection fails or usage in a browser is
-   * intentional (Use at your own risk).
-   *
-   * @defaultValue `false`
-   */
-  force?: boolean;
-};

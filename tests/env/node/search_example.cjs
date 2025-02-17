@@ -11,15 +11,13 @@ const indexUid = 'movies'
 
 const addDataset = async () => {
   await client.deleteIndex(indexUid)
-  const { taskUid } = await client.createIndex(indexUid)
-  await client.waitForTask(taskUid)
+  await client.createIndex(indexUid).waitTask()
 
   const index = client.index(indexUid)
 
   const documents = await index.getDocuments()
   if (documents.results.length === 0) {
-    const { taskUid } = await index.addDocuments(dataset)
-    await index.waitForTask(taskUid)
+    await index.addDocuments(dataset).waitTask()
   }
 }
 

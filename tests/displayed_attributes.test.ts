@@ -1,5 +1,5 @@
 import { afterAll, expect, test, describe, beforeEach } from "vitest";
-import { ErrorStatusCode } from "../src/types.js";
+import { ErrorStatusCode } from "../src/types/index.js";
 import {
   clearAllIndexes,
   config,
@@ -23,8 +23,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     beforeEach(async () => {
       await clearAllIndexes(config);
       const client = await getClient("Master");
-      const { taskUid } = await client.index(index.uid).addDocuments(dataset);
-      await client.waitForTask(taskUid);
+      await client.index(index.uid).addDocuments(dataset).waitTask();
     });
 
     test(`${permission} key: Get default displayed attributes`, async () => {
@@ -37,10 +36,10 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     test(`${permission} key: Update displayed attributes`, async () => {
       const client = await getClient(permission);
       const newDisplayedAttribute = ["title"];
-      const task = await client
+      await client
         .index(index.uid)
-        .updateDisplayedAttributes(newDisplayedAttribute);
-      await client.index(index.uid).waitForTask(task.taskUid);
+        .updateDisplayedAttributes(newDisplayedAttribute)
+        .waitTask();
 
       const response = await client.index(index.uid).getDisplayedAttributes();
 
@@ -50,10 +49,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     test(`${permission} key: Update displayed attributes at null`, async () => {
       const client = await getClient(permission);
 
-      const task = await client
-        .index(index.uid)
-        .updateDisplayedAttributes(null);
-      await client.index(index.uid).waitForTask(task.taskUid);
+      await client.index(index.uid).updateDisplayedAttributes(null).waitTask();
 
       const response = await client.index(index.uid).getDisplayedAttributes();
 
@@ -63,8 +59,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     test(`${permission} key: Reset displayed attributes`, async () => {
       const client = await getClient(permission);
 
-      const task = await client.index(index.uid).resetDisplayedAttributes();
-      await client.index(index.uid).waitForTask(task.taskUid);
+      await client.index(index.uid).resetDisplayedAttributes().waitTask();
 
       const response = await client.index(index.uid).getDisplayedAttributes();
 
@@ -79,8 +74,7 @@ describe.each([{ permission: "Search" }])(
     beforeEach(async () => {
       await clearAllIndexes(config);
       const client = await getClient("Master");
-      const { taskUid } = await client.createIndex(index.uid);
-      await client.waitForTask(taskUid);
+      await client.createIndex(index.uid).waitTask();
     });
 
     test(`${permission} key: try to get displayed attributes and be denied`, async () => {
@@ -112,8 +106,7 @@ describe.each([{ permission: "No" }])(
     beforeEach(async () => {
       await clearAllIndexes(config);
       const client = await getClient("Master");
-      const { taskUid } = await client.createIndex(index.uid);
-      await client.waitForTask(taskUid);
+      await client.createIndex(index.uid).waitTask();
     });
 
     test(`${permission} key: try to get displayed attributes and be denied`, async () => {

@@ -15,35 +15,41 @@ import type {
   Health,
   Stats,
   Version,
-  TasksQuery,
-  WaitOptions,
   KeyUpdate,
   IndexesQuery,
   IndexesResults,
   KeysQuery,
   KeysResults,
-  TasksResults,
-  EnqueuedTaskObject,
-  SwapIndexesParams,
-  CancelTasksQuery,
-  DeleteTasksQuery,
+  IndexSwap,
   MultiSearchParams,
   FederatedMultiSearchParams,
-  BatchesResults,
-  BatchesQuery,
   MultiSearchResponseOrSearchResponse,
-} from "./types.js";
-import { ErrorStatusCode } from "./types.js";
+  EnqueuedTaskPromise,
+} from "./types/index.js";
+import { ErrorStatusCode } from "./types/index.js";
 import { HttpRequests } from "./http-requests.js";
-import { TaskClient, type Task } from "./task.js";
-import { EnqueuedTask } from "./enqueued-task.js";
-import { type Batch, BatchClient } from "./batch.js";
+import {
+  getHttpRequestsWithEnqueuedTaskPromise,
+  TaskClient,
+  type HttpRequestsWithEnqueuedTaskPromise,
+} from "./task.js";
+import { BatchClient } from "./batch.js";
 
 export class MeiliSearch {
   config: Config;
   httpRequest: HttpRequests;
-  tasks: TaskClient;
-  batches: BatchClient;
+
+  readonly #taskClient: TaskClient;
+  get tasks() {
+    return this.#taskClient;
+  }
+
+  readonly #batchClient: BatchClient;
+  get batches() {
+    return this.#batchClient;
+  }
+
+  readonly #httpRequestsWithTask: HttpRequestsWithEnqueuedTaskPromise;
 
   /**
    * Creates new MeiliSearch instance
@@ -53,8 +59,17 @@ export class MeiliSearch {
   constructor(config: Config) {
     this.config = config;
     this.httpRequest = new HttpRequests(config);
-    this.tasks = new TaskClient(config);
-    this.batches = new BatchClient(config);
+
+    this.#taskClient = new TaskClient(
+      this.httpRequest,
+      config.defaultWaitOptions,
+    );
+    this.#batchClient = new BatchClient(this.httpRequest);
+
+    this.#httpRequestsWithTask = getHttpRequestsWithEnqueuedTaskPromise(
+      this.httpRequest,
+      this.tasks,
+    );
   }
 
   /**
@@ -132,11 +147,8 @@ export class MeiliSearch {
    * @param options - Index options
    * @returns Promise returning Index instance
    */
-  async createIndex(
-    uid: string,
-    options: IndexOptions = {},
-  ): Promise<EnqueuedTask> {
-    return await Index.create(uid, options, this.config);
+  createIndex(uid: string, options?: IndexOptions): EnqueuedTaskPromise {
+    return Index.create(uid, options, this.config);
   }
 
   /**
@@ -146,11 +158,8 @@ export class MeiliSearch {
    * @param options - Index options to update
    * @returns Promise returning Index instance after updating
    */
-  async updateIndex(
-    uid: string,
-    options: IndexOptions = {},
-  ): Promise<EnqueuedTask> {
-    return await new Index(this.config, uid).update(options);
+  updateIndex(uid: string, options?: IndexOptions): EnqueuedTaskPromise {
+    return new Index(this.config, uid).update(options);
   }
 
   /**
@@ -159,8 +168,8 @@ export class MeiliSearch {
    * @param uid - The index UID
    * @returns Promise which resolves when index is deleted successfully
    */
-  async deleteIndex(uid: string): Promise<EnqueuedTask> {
-    return await new Index(this.config, uid).delete();
+  deleteIndex(uid: string): EnqueuedTaskPromise {
+    return new Index(this.config, uid).delete();
   }
 
   /**
@@ -188,9 +197,9 @@ export class MeiliSearch {
    * @param params - List of indexes tuples to swap.
    * @returns Promise returning object of the enqueued task
    */
-  async swapIndexes(params: SwapIndexesParams): Promise<EnqueuedTask> {
+  swapIndexes(params: IndexSwap[]): EnqueuedTaskPromise {
     const url = "/swap-indexes";
-    return await this.httpRequest.post(url, params);
+    return this.#httpRequestsWithTask.post(url, params);
   }
 
   ///
@@ -228,104 +237,6 @@ export class MeiliSearch {
     const url = `multi-search`;
 
     return await this.httpRequest.post(url, queries, undefined, config);
-  }
-
-  ///
-  /// TASKS
-  ///
-
-  /**
-   * Get the list of all client tasks
-   *
-   * @param parameters - Parameters to browse the tasks
-   * @returns Promise returning all tasks
-   */
-  async getTasks(parameters: TasksQuery = {}): Promise<TasksResults> {
-    return await this.tasks.getTasks(parameters);
-  }
-
-  /**
-   * Get one task on the client scope
-   *
-   * @param taskUid - Task identifier
-   * @returns Promise returning a task
-   */
-  async getTask(taskUid: number): Promise<Task> {
-    return await this.tasks.getTask(taskUid);
-  }
-
-  /**
-   * Wait for multiple tasks to be finished.
-   *
-   * @param taskUids - Tasks identifier
-   * @param waitOptions - Options on timeout and interval
-   * @returns Promise returning an array of tasks
-   */
-  async waitForTasks(
-    taskUids: number[],
-    { timeOutMs = 5000, intervalMs = 50 }: WaitOptions = {},
-  ): Promise<Task[]> {
-    return await this.tasks.waitForTasks(taskUids, {
-      timeOutMs,
-      intervalMs,
-    });
-  }
-
-  /**
-   * Wait for a task to be finished.
-   *
-   * @param taskUid - Task identifier
-   * @param waitOptions - Options on timeout and interval
-   * @returns Promise returning an array of tasks
-   */
-  async waitForTask(
-    taskUid: number,
-    { timeOutMs = 5000, intervalMs = 50 }: WaitOptions = {},
-  ): Promise<Task> {
-    return await this.tasks.waitForTask(taskUid, {
-      timeOutMs,
-      intervalMs,
-    });
-  }
-
-  /**
-   * Cancel a list of enqueued or processing tasks.
-   *
-   * @param parameters - Parameters to filter the tasks.
-   * @returns Promise containing an EnqueuedTask
-   */
-  async cancelTasks(parameters: CancelTasksQuery): Promise<EnqueuedTask> {
-    return await this.tasks.cancelTasks(parameters);
-  }
-
-  /**
-   * Delete a list of tasks.
-   *
-   * @param parameters - Parameters to filter the tasks.
-   * @returns Promise containing an EnqueuedTask
-   */
-  async deleteTasks(parameters: DeleteTasksQuery = {}): Promise<EnqueuedTask> {
-    return await this.tasks.deleteTasks(parameters);
-  }
-
-  /**
-   * Get all the batches
-   *
-   * @param parameters - Parameters to browse the batches
-   * @returns Promise returning all batches
-   */
-  async getBatches(parameters: BatchesQuery = {}): Promise<BatchesResults> {
-    return await this.batches.getBatches(parameters);
-  }
-
-  /**
-   * Get one batch
-   *
-   * @param uid - Batch identifier
-   * @returns Promise returning a batch
-   */
-  async getBatch(uid: number): Promise<Batch> {
-    return await this.batches.getBatch(uid);
   }
 
   ///
@@ -462,12 +373,9 @@ export class MeiliSearch {
    *
    * @returns Promise returning object of the enqueued task
    */
-  async createDump(): Promise<EnqueuedTask> {
+  createDump(): EnqueuedTaskPromise {
     const url = `dumps`;
-    const task = await this.httpRequest.post<undefined, EnqueuedTaskObject>(
-      url,
-    );
-    return new EnqueuedTask(task);
+    return this.#httpRequestsWithTask.post(url);
   }
 
   ///
@@ -479,12 +387,8 @@ export class MeiliSearch {
    *
    * @returns Promise returning object of the enqueued task
    */
-  async createSnapshot(): Promise<EnqueuedTask> {
+  createSnapshot(): EnqueuedTaskPromise {
     const url = `snapshots`;
-    const task = await this.httpRequest.post<undefined, EnqueuedTaskObject>(
-      url,
-    );
-
-    return new EnqueuedTask(task);
+    return this.#httpRequestsWithTask.post(url);
   }
 }

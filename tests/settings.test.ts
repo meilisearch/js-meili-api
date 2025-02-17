@@ -1,5 +1,5 @@
 import { afterAll, beforeEach, describe, expect, test } from "vitest";
-import { ErrorStatusCode, type Settings } from "../src/types.js";
+import { ErrorStatusCode, type Settings } from "../src/types/index.js";
 import {
   clearAllIndexes,
   config,
@@ -27,17 +27,14 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     beforeEach(async () => {
       await clearAllIndexes(config);
       const client = await getClient("Master");
-      const { taskUid: AddDocPkTask } = await client
+      await client
         .index(indexAndPK.uid)
         .addDocuments(dataset, {
           primaryKey: indexAndPK.primaryKey,
-        });
-      await client.waitForTask(AddDocPkTask);
+        })
+        .waitTask();
 
-      const { taskUid: AddDocTask } = await client
-        .index(index.uid)
-        .addDocuments(dataset, {});
-      await client.waitForTask(AddDocTask);
+      await client.index(index.uid).addDocuments(dataset, {}).waitTask();
     });
 
     test(`${permission} key: Get default settings of an index`, async () => {
@@ -94,8 +91,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
         prefixSearch: "indexingTime",
       };
       // Add the settings
-      const task = await client.index(index.uid).updateSettings(newSettings);
-      await client.index(index.uid).waitForTask(task.taskUid);
+      await client.index(index.uid).updateSettings(newSettings).waitTask();
 
       // Fetch the settings
       const response = await client.index(index.uid).getSettings();
@@ -137,8 +133,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
         searchCutoffMs: null,
       };
       // Add the settings
-      const task = await client.index(index.uid).updateSettings(newSettings);
-      await client.index(index.uid).waitForTask(task.taskUid);
+      await client.index(index.uid).updateSettings(newSettings).waitTask();
 
       // Fetch the settings
       const response = await client.index(index.uid).getSettings();
@@ -159,10 +154,10 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
           },
         },
       };
-      const task = await client.index(index.uid).updateSettings(newSettings);
       await client
         .index(index.uid)
-        .waitForTask(task.taskUid, { timeOutMs: 60_000 });
+        .updateSettings(newSettings)
+        .waitTask({ timeout: 60_000 });
       const response = await client.index(index.uid).getSettings();
 
       expect(response).toMatchSnapshot();
@@ -175,10 +170,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
         rankingRules: ["title:asc", "typo"],
         stopWords: ["the"],
       };
-      const task = await client
-        .index(indexAndPK.uid)
-        .updateSettings(newSettings);
-      await client.index(indexAndPK.uid).waitForTask(task.taskUid);
+      await client.index(indexAndPK.uid).updateSettings(newSettings).waitTask();
 
       const response = await client.index(indexAndPK.uid).getSettings();
 
@@ -187,8 +179,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: Reset settings`, async () => {
       const client = await getClient(permission);
-      const task = await client.index(index.uid).resetSettings();
-      await client.index(index.uid).waitForTask(task.taskUid);
+      await client.index(index.uid).resetSettings().waitTask();
 
       const response = await client.index(index.uid).getSettings();
 
@@ -197,8 +188,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: Reset settings of empty index`, async () => {
       const client = await getClient(permission);
-      const task = await client.index(indexAndPK.uid).resetSettings();
-      await client.index(index.uid).waitForTask(task.taskUid);
+      await client.index(indexAndPK.uid).resetSettings().waitTask();
 
       const response = await client.index(indexAndPK.uid).getSettings();
 
@@ -211,8 +201,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
       const newSettings: Settings = {
         embedders: null,
       };
-      const task = await client.index(index.uid).updateSettings(newSettings);
-      await client.index(index.uid).waitForTask(task.taskUid);
+      await client.index(index.uid).updateSettings(newSettings).waitTask();
       const response = await client.index(index.uid).getSettings();
 
       expect(response).toMatchSnapshot();
@@ -223,8 +212,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
       const newSettings = {
         searchableAttributes: ["title"],
       };
-      const task = await client.index(index.uid).updateSettings(newSettings);
-      await client.index(index.uid).waitForTask(task.taskUid);
+      await client.index(index.uid).updateSettings(newSettings).waitTask();
 
       const response = await client.index(index.uid).getSettings();
 
@@ -237,11 +225,8 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
         searchableAttributes: ["title"],
       };
       // Update settings
-      const task = await client
-        .index(indexAndPK.uid)
-        .updateSettings(newSettings);
+      await client.index(indexAndPK.uid).updateSettings(newSettings).waitTask();
       // Wait for setting addition to be done
-      await client.index(index.uid).waitForTask(task.taskUid);
 
       // Fetch settings
       const response = await client.index(indexAndPK.uid).getSettings();
@@ -252,10 +237,10 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     test(`${permission} key: Update facetSearch settings on empty index`, async () => {
       const client = await getClient(permission);
 
-      const { taskUid } = await client
+      await client
         .index(index.uid)
-        .updateSettings({ facetSearch: false });
-      await client.index(index.uid).waitForTask(taskUid);
+        .updateSettings({ facetSearch: false })
+        .waitTask();
 
       const response = await client.index(index.uid).getSettings();
       expect(response).toMatchSnapshot();
@@ -264,10 +249,10 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     test(`${permission} key: Update prefixSearch settings on an empty index`, async () => {
       const client = await getClient(permission);
 
-      const { taskUid } = await client
+      await client
         .index(index.uid)
-        .updateSettings({ prefixSearch: "disabled" });
-      await client.index(index.uid).waitForTask(taskUid);
+        .updateSettings({ prefixSearch: "disabled" })
+        .waitTask();
 
       const response = await client.index(index.uid).getSettings();
       expect(response).toMatchSnapshot();

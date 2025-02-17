@@ -1,5 +1,5 @@
 import { expect, test, describe, beforeEach, afterAll } from "vitest";
-import { ErrorStatusCode } from "../src/types.js";
+import { ErrorStatusCode } from "../src/types/index.js";
 import {
   clearAllIndexes,
   config,
@@ -16,9 +16,7 @@ const indexPk = {
   primaryKey: "id",
 };
 
-afterAll(async () => {
-  return clearAllIndexes(config);
-});
+afterAll(() => clearAllIndexes(config));
 
 describe.each([{ permission: "Master" }, { permission: "Admin" }])(
   "Test on indexes w/ master and admin key",
@@ -29,8 +27,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: create index with NO primary key`, async () => {
       const client = await getClient(permission);
-      const { taskUid } = await client.createIndex(indexNoPk.uid);
-      await client.waitForTask(taskUid);
+      await client.createIndex(indexNoPk.uid).waitTask();
 
       const newIndex = await client.getIndex(indexNoPk.uid);
 
@@ -47,10 +44,11 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: create index with primary key`, async () => {
       const client = await getClient(permission);
-      const { taskUid } = await client.createIndex(indexPk.uid, {
-        primaryKey: indexPk.primaryKey,
-      });
-      await client.waitForTask(taskUid);
+      await client
+        .createIndex(indexPk.uid, {
+          primaryKey: indexPk.primaryKey,
+        })
+        .waitTask();
 
       const newIndex = await client.getIndex(indexPk.uid);
 
@@ -67,8 +65,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: Get raw index that exists`, async () => {
       const client = await getClient(permission);
-      const { taskUid } = await client.createIndex(indexPk.uid);
-      await client.waitForTask(taskUid);
+      await client.createIndex(indexPk.uid).waitTask();
 
       const response = await client.getRawIndex(indexPk.uid);
 
@@ -77,8 +74,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: Get all indexes in Index instances`, async () => {
       const client = await getClient(permission);
-      const { taskUid } = await client.createIndex(indexPk.uid);
-      await client.waitForTask(taskUid);
+      await client.createIndex(indexPk.uid).waitTask();
 
       const { results } = await client.getRawIndexes();
 
@@ -104,10 +100,9 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: Get raw index info through client with primary key`, async () => {
       const client = await getClient(permission);
-      const { taskUid } = await client.createIndex(indexPk.uid, {
-        primaryKey: indexPk.primaryKey,
-      });
-      await client.waitForTask(taskUid);
+      await client
+        .createIndex(indexPk.uid, { primaryKey: indexPk.primaryKey })
+        .waitTask();
 
       const response = await client.getRawIndex(indexPk.uid);
 
@@ -117,8 +112,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: Get raw index info through client with NO primary key`, async () => {
       const client = await getClient(permission);
-      const { taskUid } = await client.createIndex(indexNoPk.uid);
-      await client.waitForTask(taskUid);
+      await client.createIndex(indexNoPk.uid).waitTask();
 
       const response = await client.getRawIndex(indexNoPk.uid);
 
@@ -128,10 +122,9 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: Get raw index info with primary key`, async () => {
       const client = await getClient(permission);
-      const { taskUid } = await client.createIndex(indexPk.uid, {
-        primaryKey: indexPk.primaryKey,
-      });
-      await client.waitForTask(taskUid);
+      await client
+        .createIndex(indexPk.uid, { primaryKey: indexPk.primaryKey })
+        .waitTask();
 
       const response = await client.index(indexPk.uid).getRawInfo();
 
@@ -141,8 +134,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: Get raw index info with NO primary key`, async () => {
       const client = await getClient(permission);
-      const { taskUid } = await client.createIndex(indexNoPk.uid);
-      await client.waitForTask(taskUid);
+      await client.createIndex(indexNoPk.uid).waitTask();
 
       const response = await client.index(indexNoPk.uid).getRawInfo();
 
@@ -152,10 +144,11 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: fetch index with primary key`, async () => {
       const client = await getClient(permission);
-      const { taskUid } = await client.createIndex(indexPk.uid, {
-        primaryKey: indexPk.primaryKey,
-      });
-      await client.waitForTask(taskUid);
+      await client
+        .createIndex(indexPk.uid, {
+          primaryKey: indexPk.primaryKey,
+        })
+        .waitTask();
 
       const index = client.index(indexPk.uid);
       const response = await index.fetchInfo();
@@ -166,10 +159,11 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: fetch primary key on an index with primary key`, async () => {
       const client = await getClient(permission);
-      const { taskUid } = await client.createIndex(indexPk.uid, {
-        primaryKey: indexPk.primaryKey,
-      });
-      await client.waitForTask(taskUid);
+      await client
+        .createIndex(indexPk.uid, {
+          primaryKey: indexPk.primaryKey,
+        })
+        .waitTask();
 
       const index = client.index(indexPk.uid);
       const response: string | undefined = await index.fetchPrimaryKey();
@@ -179,8 +173,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: fetch primary key on an index with NO primary key`, async () => {
       const client = await getClient(permission);
-      const { taskUid } = await client.createIndex(indexNoPk.uid);
-      await client.waitForTask(taskUid);
+      await client.createIndex(indexNoPk.uid).waitTask();
 
       const index = client.index(indexNoPk.uid);
       const response: string | undefined = await index.fetchPrimaryKey();
@@ -190,10 +183,11 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: fetch index with primary key`, async () => {
       const client = await getClient(permission);
-      const { taskUid } = await client.createIndex(indexPk.uid, {
-        primaryKey: indexPk.primaryKey,
-      });
-      await client.waitForTask(taskUid);
+      await client
+        .createIndex(indexPk.uid, {
+          primaryKey: indexPk.primaryKey,
+        })
+        .waitTask();
 
       const index = client.index(indexPk.uid);
       const response = await index.fetchInfo();
@@ -204,8 +198,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: fetch index with NO primary key`, async () => {
       const client = await getClient(permission);
-      const { taskUid } = await client.createIndex(indexNoPk.uid);
-      await client.waitForTask(taskUid);
+      await client.createIndex(indexNoPk.uid).waitTask();
 
       const index = client.index(indexNoPk.uid);
       const response = await index.fetchInfo();
@@ -216,10 +209,8 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: get all indexes`, async () => {
       const client = await getClient(permission);
-      const task1 = await client.createIndex(indexNoPk.uid);
-      const task2 = await client.createIndex(indexPk.uid);
-      await client.waitForTask(task1.taskUid);
-      await client.waitForTask(task2.taskUid);
+      await client.createIndex(indexNoPk.uid).waitTask();
+      await client.createIndex(indexPk.uid).waitTask();
 
       const indexes = await client.getIndexes();
 
@@ -228,10 +219,8 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: get all indexes with filters`, async () => {
       const client = await getClient(permission);
-      const task1 = await client.createIndex(indexNoPk.uid);
-      const task2 = await client.createIndex(indexPk.uid);
-      await client.waitForTask(task1.taskUid);
-      await client.waitForTask(task2.taskUid);
+      await client.createIndex(indexNoPk.uid).waitTask();
+      await client.createIndex(indexPk.uid).waitTask();
 
       const indexes = await client.getIndexes({ limit: 1, offset: 1 });
 
@@ -241,12 +230,11 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: update primary key on an index that has no primary key already`, async () => {
       const client = await getClient(permission);
-      const { taskUid: createTask } = await client.createIndex(indexNoPk.uid);
-      const { taskUid: updateTask } = await client.index(indexNoPk.uid).update({
-        primaryKey: "newPrimaryKey",
-      });
-      await client.waitForTask(createTask);
-      await client.waitForTask(updateTask);
+      await client.createIndex(indexNoPk.uid).waitTask();
+      await client
+        .index(indexNoPk.uid)
+        .update({ primaryKey: "newPrimaryKey" })
+        .waitTask();
 
       const index = await client.getIndex(indexNoPk.uid);
 
@@ -256,12 +244,12 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: update primary key on an index that has NO primary key already through client`, async () => {
       const client = await getClient(permission);
-      const { taskUid: createTask } = await client.createIndex(indexNoPk.uid);
-      const { taskUid: updateTask } = await client.updateIndex(indexNoPk.uid, {
-        primaryKey: indexPk.primaryKey,
-      });
-      await client.waitForTask(createTask);
-      await client.waitForTask(updateTask);
+      await client.createIndex(indexNoPk.uid).waitTask();
+      await client
+        .updateIndex(indexNoPk.uid, {
+          primaryKey: indexPk.primaryKey,
+        })
+        .waitTask();
 
       const index = await client.getIndex(indexNoPk.uid);
 
@@ -271,14 +259,16 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: update primary key on an index that has already a primary key and fail through client`, async () => {
       const client = await getClient(permission);
-      const { taskUid: createTask } = await client.createIndex(indexPk.uid, {
-        primaryKey: indexPk.primaryKey,
-      });
-      const { taskUid: updateTask } = await client.updateIndex(indexPk.uid, {
-        primaryKey: "newPrimaryKey",
-      });
-      await client.waitForTask(createTask);
-      await client.waitForTask(updateTask);
+      await client
+        .createIndex(indexPk.uid, {
+          primaryKey: indexPk.primaryKey,
+        })
+        .waitTask();
+      await client
+        .updateIndex(indexPk.uid, {
+          primaryKey: "newPrimaryKey",
+        })
+        .waitTask();
 
       const index = await client.getIndex(indexPk.uid);
 
@@ -288,14 +278,13 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: update primary key on an index that has already a primary key and fail`, async () => {
       const client = await getClient(permission);
-      const { taskUid: createTask } = await client.createIndex(indexPk.uid, {
-        primaryKey: indexPk.primaryKey,
-      });
-      const { taskUid: updateTask } = await client.index(indexPk.uid).update({
-        primaryKey: "newPrimaryKey",
-      });
-      await client.waitForTask(createTask);
-      await client.waitForTask(updateTask);
+      await client
+        .createIndex(indexPk.uid, { primaryKey: indexPk.primaryKey })
+        .waitTask();
+      await client
+        .index(indexPk.uid)
+        .update({ primaryKey: "newPrimaryKey" })
+        .waitTask();
 
       const index = await client.getIndex(indexPk.uid);
 
@@ -305,12 +294,8 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: delete index`, async () => {
       const client = await getClient(permission);
-      const { taskUid: createTask } = await client.createIndex(indexNoPk.uid);
-      const { taskUid: deleteTask } = await client
-        .index(indexNoPk.uid)
-        .delete();
-      await client.waitForTask(createTask);
-      await client.waitForTask(deleteTask);
+      await client.createIndex(indexNoPk.uid).waitTask();
+      await client.index(indexNoPk.uid).delete().waitTask();
 
       const { results } = await client.getIndexes();
 
@@ -320,8 +305,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     test(`${permission} key: delete index using client`, async () => {
       const client = await getClient(permission);
       await client.createIndex(indexPk.uid);
-      const { taskUid } = await client.deleteIndex(indexPk.uid);
-      await client.waitForTask(taskUid);
+      await client.deleteIndex(indexPk.uid).waitTask();
 
       const { results } = await client.getIndexes();
 
@@ -348,17 +332,14 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
     test(`${permission} key: delete index with uid that does not exist should fail`, async () => {
       const client = await getClient(permission);
       const index = client.index(indexNoPk.uid);
-      const { taskUid } = await index.delete();
-
-      const task = await client.waitForTask(taskUid);
+      const task = await index.delete().waitTask();
 
       expect(task.status).toBe("failed");
     });
 
     test(`${permission} key: get stats of an index`, async () => {
       const client = await getClient(permission);
-      const { taskUid } = await client.createIndex(indexNoPk.uid);
-      await client.waitForTask(taskUid);
+      await client.createIndex(indexNoPk.uid).waitTask();
 
       const response = await client.index(indexNoPk.uid).getStats();
 
@@ -369,8 +350,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: Get updatedAt and createdAt through fetch info`, async () => {
       const client = await getClient(permission);
-      const { taskUid } = await client.createIndex(indexPk.uid);
-      await client.waitForTask(taskUid);
+      await client.createIndex(indexPk.uid).waitTask();
 
       const index = await client.index(indexPk.uid).fetchInfo();
 
@@ -380,8 +360,7 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
     test(`${permission} key: Get updatedAt and createdAt index through getRawInfo`, async () => {
       const client = await getClient(permission);
-      const { taskUid } = await client.createIndex(indexPk.uid);
-      await client.waitForTask(taskUid);
+      await client.createIndex(indexPk.uid).waitTask();
 
       const index = client.index(indexPk.uid);
 

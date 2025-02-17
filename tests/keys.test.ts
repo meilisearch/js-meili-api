@@ -1,6 +1,6 @@
 import { expect, test, describe, beforeEach, afterAll } from "vitest";
 import { MeiliSearch } from "../src/index.js";
-import { ErrorStatusCode } from "../src/types.js";
+import { ErrorStatusCode } from "../src/types/index.js";
 import {
   clearAllIndexes,
   config,
@@ -137,10 +137,10 @@ describe.each([{ permission: "Master" }, { permission: "Admin" }])(
 
       const newClient = new MeiliSearch({ host: HOST, apiKey: key.key });
       await newClient.createIndex("wildcard_keys_permission"); // test index creation
-      const taskInfo = await newClient
+      const task = await newClient
         .index("wildcard_keys_permission")
-        .addDocuments([{ id: 1 }]); // test document addition
-      const task = await newClient.waitForTask(taskInfo.taskUid); // test fetching of tasks
+        .addDocuments([{ id: 1 }])
+        .waitTask(); // test document addition
 
       expect(key).toBeDefined();
       expect(task.status).toBe("succeeded");
