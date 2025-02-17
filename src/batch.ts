@@ -5,7 +5,7 @@ import type {
   BatchesResults,
   BatchesResultsObject,
 } from "./types.js";
-import { HttpRequests, toQueryParams } from "./http-requests.js";
+import { HttpRequests } from "./http-requests.js";
 
 class Batch {
   uid: BatchObject["uid"];
@@ -41,8 +41,9 @@ class BatchClient {
    * @returns
    */
   async getBatch(uid: number): Promise<Batch> {
-    const url = `batches/${uid}`;
-    const batch = await this.httpRequest.get<BatchObject>(url);
+    const batch = await this.httpRequest.get<BatchObject>({
+      path: `batches/${uid}`,
+    });
     return new Batch(batch);
   }
 
@@ -52,13 +53,11 @@ class BatchClient {
    * @param parameters - Parameters to browse the batches
    * @returns Promise containing all batches
    */
-  async getBatches(parameters: BatchesQuery = {}): Promise<BatchesResults> {
-    const url = `batches`;
-
-    const batches = await this.httpRequest.get<Promise<BatchesResultsObject>>(
-      url,
-      toQueryParams<BatchesQuery>(parameters),
-    );
+  async getBatches(batchesQuery?: BatchesQuery): Promise<BatchesResults> {
+    const batches = await this.httpRequest.get<BatchesResultsObject>({
+      path: "batches",
+      params: batchesQuery,
+    });
 
     return {
       ...batches,

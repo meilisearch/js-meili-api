@@ -5,7 +5,7 @@
     "module": "node16",
     // Node.js 18 supports up to ES2022 according to https://www.npmjs.com/package/@tsconfig/node18
     "target": "es2022",
-    "lib": ["ESNext", "dom"],
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "strict": true,
     "verbatimModuleSyntax": true
   }

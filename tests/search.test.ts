@@ -5,6 +5,8 @@ import {
   beforeEach,
   afterAll,
   beforeAll,
+  assert,
+  vi,
 } from "vitest";
 import { ErrorStatusCode, MatchingStrategies } from "../src/types.js";
 import type {
@@ -1414,8 +1416,59 @@ describe.each([
     try {
       await client.health();
     } catch (e: any) {
-      expect(e.cause.message).toEqual("Error: Request Timed Out");
+      expect(e.cause.message).toEqual("request timed out after 1ms");
       expect(e.name).toEqual("MeiliSearchRequestError");
+    }
+  });
+
+  test(`${permission} key: search should be aborted on abort signal`, async () => {
+    const key = await getKey(permission);
+    const client = new MeiliSearch({
+      ...config,
+      apiKey: key,
+      timeout: 1_000,
+    });
+    const someErrorObj = {};
+
+    try {
+      const ac = new AbortController();
+      ac.abort(someErrorObj);
+
+      await client.multiSearch(
+        { queries: [{ indexUid: "doesn't matter" }] },
+        { signal: ac.signal },
+      );
+    } catch (e: any) {
+      assert.strictEqual(e.cause, someErrorObj);
+      assert.strictEqual(e.name, "MeiliSearchRequestError");
+    }
+
+    // and now with a delayed abort, for this we have to stub fetch
+    vi.stubGlobal(
+      "fetch",
+      (_: unknown, requestInit?: RequestInit) =>
+        new Promise((_, reject) =>
+          requestInit?.signal?.addEventListener("abort", () =>
+            // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
+            reject(requestInit.signal?.reason),
+          ),
+        ),
+    );
+
+    try {
+      const ac = new AbortController();
+
+      const promise = client.multiSearch(
+        { queries: [{ indexUid: "doesn't matter" }] },
+        { signal: ac.signal },
+      );
+      setTimeout(() => ac.abort(someErrorObj), 1);
+      await promise;
+    } catch (e: any) {
+      assert.strictEqual(e.cause, someErrorObj);
+      assert.strictEqual(e.name, "MeiliSearchRequestError");
+    } finally {
+      vi.unstubAllGlobals();
     }
   });
 });

@@ -1,27 +1,39 @@
-import { afterAll, expect, test } from "vitest";
+import {
+  afterAll,
+  assert,
+  beforeAll,
+  type MockInstance,
+  test,
+  vi,
+} from "vitest";
 import {
   clearAllIndexes,
   config,
   MeiliSearch,
 } from "./utils/meilisearch-test-utils.js";
 
-afterAll(() => {
-  return clearAllIndexes(config);
+let fetchSpy: MockInstance<typeof fetch>;
+
+beforeAll(() => {
+  fetchSpy = vi.spyOn(globalThis, "fetch");
 });
 
-test(`Client handles host URL with domain and path`, () => {
-  const customHost = `${config.host}/api/`;
-  const client = new MeiliSearch({
-    host: customHost,
-  });
-  expect(client.config.host).toBe(customHost);
-  expect(client.httpRequest.url.href).toBe(customHost);
+afterAll(async () => {
+  fetchSpy.mockRestore();
+  await clearAllIndexes(config);
 });
 
-test(`Client handles host URL with domain and path and no trailing slash`, () => {
+test(`Client handles host URL with domain and path, and adds trailing slash`, async () => {
   const customHost = `${config.host}/api`;
-  const client = new MeiliSearch({
-    host: customHost,
-  });
-  expect(client.httpRequest.url.href).toBe(customHost + "/");
+  const client = new MeiliSearch({ host: customHost });
+
+  assert.strictEqual(client.config.host, customHost);
+
+  await client.isHealthy();
+
+  assert.isDefined(fetchSpy.mock.lastCall);
+  const [input] = fetchSpy.mock.lastCall!;
+
+  assert.instanceOf(input, URL);
+  assert.strictEqual((input as URL).href, `${customHost}/health`);
 });
